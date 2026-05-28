@@ -16,6 +16,10 @@ All app-level types use the `PF` prefix.
 
 Resource workflow, SwiftGen usage, naming rules, and replacement order are documented in [PFResourceManagement.md](Docs/PFResourceManagement.md).
 
+## Design Adaptation
+
+Design token mapping and design file intake order are documented in [PFDesignAdaptation.md](Docs/PFDesignAdaptation.md).
+
 ## Platform Policy
 
 This project follows a latest-dependency-first policy. Deployment targets and dependency rules are documented in [PFPlatformPolicy.md](Docs/PFPlatformPolicy.md).

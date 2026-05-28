@@ -38,7 +38,7 @@ private struct PFDashboardSummaryRow: View {
             Text(item.title)
             Spacer()
             Text(item.value)
-                .foregroundStyle(.secondary)
+                .pfSecondaryText(PFTypography.body)
         }
     }
 }

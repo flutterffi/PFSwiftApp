@@ -15,7 +15,7 @@ struct PFTasksView: View {
                 }
 
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: PFSpacing.medium) {
                         Picker(
                             "Filter",
                             selection: $store.selectedFilter.sending(\.filterChanged)
@@ -38,8 +38,8 @@ struct PFTasksView: View {
                 }
 
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: PFSpacing.medium) {
+                        HStack(spacing: PFSpacing.medium) {
                             TextField(
                                 "New task",
                                 text: $store.draftTitle.sending(\.draftTitleChanged)
@@ -55,7 +55,7 @@ struct PFTasksView: View {
                             .buttonStyle(.borderless)
                         }
 
-                        HStack(spacing: 12) {
+                        HStack(spacing: PFSpacing.medium) {
                             Picker(
                                 "Priority",
                                 selection: $store.selectedPriority.sending(\.selectedPriorityChanged)
@@ -64,7 +64,7 @@ struct PFTasksView: View {
                                     Text(priority.rawValue).tag(priority)
                                 }
                             }
-                            .frame(maxWidth: 140)
+                            .frame(maxWidth: PFSize.compactPickerMaxWidth)
 
                             Picker(
                                 "Due",
@@ -83,19 +83,17 @@ struct PFTasksView: View {
                         Button {
                             store.send(.taskCompletionToggled(task.id))
                         } label: {
-                            HStack(spacing: 12) {
+                            HStack(spacing: PFSpacing.medium) {
                                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(task.isCompleted ? PFAsset.pfSuccess.swiftUIColor : .secondary)
+                                    .foregroundStyle(task.isCompleted ? PFPalette.success : .secondary)
                                 Text(task.title)
                                     .strikethrough(task.isCompleted)
                                     .foregroundStyle(task.isCompleted ? .secondary : .primary)
                                 Text(task.priority.rawValue)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .pfSecondaryText()
                                 if task.dueDate != .none {
                                     Text(task.dueDate.rawValue)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .pfSecondaryText()
                                 }
                                 Spacer()
 
@@ -121,7 +119,7 @@ struct PFTasksView: View {
                                 }
                                 .buttonStyle(.borderless)
                             }
-                            .contentShape(Rectangle())
+                            .pfListButtonRow()
                         }
                         .buttonStyle(.plain)
                     }

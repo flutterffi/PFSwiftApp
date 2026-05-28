@@ -4,17 +4,16 @@ struct PFEmptyStateView: View {
     var title: String
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: PFSpacing.small) {
             PFAsset.pfEmptyState.swiftUIImage
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: 120)
+                .frame(maxWidth: PFSize.emptyStateImageMaxWidth)
                 .accessibilityHidden(true)
             Text(title)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .pfSecondaryText(PFTypography.emptyState)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
+        .padding(.vertical, PFSpacing.medium)
     }
 }

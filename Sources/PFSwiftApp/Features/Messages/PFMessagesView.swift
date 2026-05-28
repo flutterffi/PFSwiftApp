@@ -19,24 +19,23 @@ struct PFMessagesView: View {
                         Button {
                             store.send(.threadTapped(thread.id))
                         } label: {
-                            HStack(spacing: 12) {
+                            HStack(spacing: PFSpacing.medium) {
                                 Image(systemName: thread.isUnread ? "circle.fill" : "circle")
-                                    .font(.caption)
-                                    .foregroundStyle(thread.isUnread ? PFAsset.pfPrimary.swiftUIColor : .secondary)
+                                    .font(PFTypography.metadata)
+                                    .foregroundStyle(thread.isUnread ? PFPalette.primary : .secondary)
 
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack(spacing: 6) {
+                                VStack(alignment: .leading, spacing: PFSpacing.xSmall) {
+                                    HStack(spacing: PFSpacing.small) {
                                         Text(thread.title)
-                                            .font(.headline)
+                                            .font(PFTypography.headline)
                                         if thread.isPinned {
                                             Image(systemName: "pin.fill")
-                                                .font(.caption)
-                                                .foregroundStyle(PFAsset.pfWarning.swiftUIColor)
+                                                .font(PFTypography.metadata)
+                                                .foregroundStyle(PFPalette.warning)
                                         }
                                     }
                                     Text(thread.preview)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                                        .pfSecondaryText(PFTypography.subheadline)
                                 }
 
                                 Spacer()
@@ -55,7 +54,7 @@ struct PFMessagesView: View {
                                 }
                                 .buttonStyle(.borderless)
                             }
-                            .contentShape(Rectangle())
+                            .pfListButtonRow()
                         }
                         .buttonStyle(.plain)
                     }
