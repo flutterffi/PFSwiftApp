@@ -18,3 +18,13 @@ strings:
       params:
         enumName: PFStrings
       output: PFStrings.swift
+
+json:
+  inputs:
+    - Mock/PFDashboardSummary.json
+    - Mock/PFTabItems.json
+  outputs:
+    - templateName: runtime-swift5
+      params:
+        enumName: PFJSON
+      output: PFJSON.swift

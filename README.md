@@ -11,3 +11,7 @@ PFSwiftApp is a SwiftUI application baseline built around The Composable Archite
 - `PFSettingsFeature` provides settings state and toggles.
 
 All app-level types use the `PF` prefix.
+
+## Resources
+
+Resource workflow, SwiftGen usage, naming rules, and replacement order are documented in [PFResourceManagement.md](Docs/PFResourceManagement.md).

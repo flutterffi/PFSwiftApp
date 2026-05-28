@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "asset": "PFTabDashboard"
+    },
+    {
+      "id": "tasks",
+      "title": "Tasks",
+      "asset": "PFTabTasks"
+    },
+    {
+      "id": "messages",
+      "title": "Messages",
+      "asset": "PFTabMessages"
+    },
+    {
+      "id": "settings",
+      "title": "Settings",
+      "asset": "PFTabSettings"
+    }
+  ]
+}
