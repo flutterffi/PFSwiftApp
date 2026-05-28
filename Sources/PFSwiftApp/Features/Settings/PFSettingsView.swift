@@ -19,6 +19,29 @@ struct PFSettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .overlay {
+                if store.isLoading {
+                    ProgressView()
+                }
+            }
+            .alert(
+                "Settings Error",
+                isPresented: Binding(
+                    get: { store.errorMessage != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            store.send(.settingsErrorDismissed)
+                        }
+                    }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(store.errorMessage ?? "")
+            }
+            .task {
+                await store.send(.task).finish()
+            }
         }
     }
 }
