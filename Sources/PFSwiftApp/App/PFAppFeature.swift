@@ -43,7 +43,15 @@ struct PFAppFeature: Reducer {
                 state.selectedTab = tab
                 return .none
 
-            case .dashboard, .tasks, .messages, .settings:
+            case .tasks:
+                state.dashboard.summaryItems = [
+                    PFDashboardSummary(title: "Open Tasks", value: "\(state.tasks.activeTaskCount)"),
+                    PFDashboardSummary(title: "Done Tasks", value: "\(state.tasks.completedTaskCount)"),
+                    PFDashboardSummary(title: "Total Tasks", value: "\(state.tasks.tasks.count)")
+                ]
+                return .none
+
+            case .dashboard, .messages, .settings:
                 return .none
             }
         }

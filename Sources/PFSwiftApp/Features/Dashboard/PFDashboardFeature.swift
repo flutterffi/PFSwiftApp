@@ -4,9 +4,9 @@ struct PFDashboardFeature: Reducer {
     struct State: Equatable {
         var title = "Operations"
         var summaryItems: [PFDashboardSummary] = [
-            PFDashboardSummary(title: "Open Tasks", value: "3"),
-            PFDashboardSummary(title: "Messages", value: "2"),
-            PFDashboardSummary(title: "Status", value: "Ready")
+            PFDashboardSummary(title: "Open Tasks", value: "2"),
+            PFDashboardSummary(title: "Done Tasks", value: "1"),
+            PFDashboardSummary(title: "Total Tasks", value: "3")
         ]
     }
 

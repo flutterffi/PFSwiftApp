@@ -42,4 +42,27 @@ final class PFTasksFeatureTests: XCTestCase {
             $0.tasks = []
         }
     }
+
+    func testFilterAndDeleteVisibleTask() async {
+        let activeID = UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC")!
+        let doneID = UUID(uuidString: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD")!
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                selectedFilter: .done,
+                tasks: [
+                    PFTaskItem(id: activeID, title: "Active task"),
+                    PFTaskItem(id: doneID, title: "Done task", isCompleted: true)
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        }
+
+        await store.send(.filterChanged(.done))
+        await store.send(.delete(IndexSet(integer: 0))) {
+            $0.tasks = [
+                PFTaskItem(id: activeID, title: "Active task")
+            ]
+        }
+    }
 }

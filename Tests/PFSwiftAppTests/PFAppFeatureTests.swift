@@ -1,0 +1,30 @@
+import ComposableArchitecture
+@testable import PFSwiftApp
+import XCTest
+
+@MainActor
+final class PFAppFeatureTests: XCTestCase {
+    func testDashboardTaskSummaryUpdatesAfterTaskAction() async {
+        let taskID = UUID(uuidString: "EEEEEEEE-EEEE-EEEE-EEEE-EEEEEEEEEEEE")!
+        let store = TestStore(
+            initialState: PFAppFeature.State(
+                tasks: PFTasksFeature.State(
+                    tasks: [
+                        PFTaskItem(id: taskID, title: "Open")
+                    ]
+                )
+            )
+        ) {
+            PFAppFeature()
+        }
+
+        await store.send(.tasks(.taskCompletionToggled(taskID))) {
+            $0.tasks.tasks[id: taskID]?.isCompleted = true
+            $0.dashboard.summaryItems = [
+                PFDashboardSummary(title: "Open Tasks", value: "0"),
+                PFDashboardSummary(title: "Done Tasks", value: "1"),
+                PFDashboardSummary(title: "Total Tasks", value: "1")
+            ]
+        }
+    }
+}

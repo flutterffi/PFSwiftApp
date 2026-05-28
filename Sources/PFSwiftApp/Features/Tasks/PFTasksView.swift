@@ -9,6 +9,21 @@ struct PFTasksView: View {
             NavigationStack {
                 List {
                     Section {
+                        Picker(
+                            "Filter",
+                            selection: viewStore.binding(
+                                get: \.selectedFilter,
+                                send: PFTasksFeature.Action.filterChanged
+                            )
+                        ) {
+                            ForEach(PFTaskFilter.allCases) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+
+                    Section {
                         HStack(spacing: 12) {
                             TextField(
                                 "New task",
@@ -30,7 +45,7 @@ struct PFTasksView: View {
                     }
 
                     Section {
-                        ForEach(viewStore.tasks) { task in
+                        ForEach(viewStore.visibleTasks) { task in
                             Button {
                                 viewStore.send(.taskCompletionToggled(task.id))
                             } label: {
@@ -51,6 +66,10 @@ struct PFTasksView: View {
                         }
                     } header: {
                         Text("\(viewStore.activeTaskCount) Active")
+                    } footer: {
+                        if viewStore.visibleTasks.isEmpty {
+                            Text("No tasks in this view.")
+                        }
                     }
                 }
                 .navigationTitle("Tasks")
