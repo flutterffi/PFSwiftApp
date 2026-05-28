@@ -1,6 +1,8 @@
 import ComposableArchitecture
 
-struct PFDashboardFeature: Reducer {
+@Reducer
+struct PFDashboardFeature {
+    @ObservableState
     struct State: Equatable {
         var title = "Operations"
         var summaryItems: [PFDashboardSummary] = [
@@ -13,7 +15,7 @@ struct PFDashboardFeature: Reducer {
     enum Action: Equatable {}
 
     var body: some ReducerOf<Self> {
-        Reduce { _, _ in .none }
+        EmptyReducer()
     }
 }
 

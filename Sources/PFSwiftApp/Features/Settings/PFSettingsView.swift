@@ -2,31 +2,23 @@ import ComposableArchitecture
 import SwiftUI
 
 struct PFSettingsView: View {
-    let store: StoreOf<PFSettingsFeature>
+    @Bindable var store: StoreOf<PFSettingsFeature>
 
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            NavigationStack {
-                Form {
-                    Section("Telemetry") {
-                        Toggle(
-                            "Analytics",
-                            isOn: viewStore.binding(
-                                get: \.isAnalyticsEnabled,
-                                send: PFSettingsFeature.Action.analyticsChanged
-                            )
-                        )
-                        Toggle(
-                            "Crash Reporting",
-                            isOn: viewStore.binding(
-                                get: \.isCrashReportingEnabled,
-                                send: PFSettingsFeature.Action.crashReportingChanged
-                            )
-                        )
-                    }
+        NavigationStack {
+            Form {
+                Section("Telemetry") {
+                    Toggle(
+                        "Analytics",
+                        isOn: $store.isAnalyticsEnabled.sending(\.analyticsChanged)
+                    )
+                    Toggle(
+                        "Crash Reporting",
+                        isOn: $store.isCrashReportingEnabled.sending(\.crashReportingChanged)
+                    )
                 }
-                .navigationTitle("Settings")
             }
+            .navigationTitle("Settings")
         }
     }
 }

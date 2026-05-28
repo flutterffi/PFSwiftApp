@@ -1,6 +1,8 @@
 import ComposableArchitecture
 
-struct PFMessagesFeature: Reducer {
+@Reducer
+struct PFMessagesFeature {
+    @ObservableState
     struct State: Equatable {
         var threads: [PFMessageThread] = [
             PFMessageThread(title: "Platform", preview: "Architecture baseline is ready."),
@@ -11,7 +13,7 @@ struct PFMessagesFeature: Reducer {
     enum Action: Equatable {}
 
     var body: some ReducerOf<Self> {
-        Reduce { _, _ in .none }
+        EmptyReducer()
     }
 }
 

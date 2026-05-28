@@ -1,9 +1,11 @@
 import ComposableArchitecture
 import Foundation
 
-struct PFTasksFeature: Reducer {
+@Reducer
+struct PFTasksFeature {
     @Dependency(\.uuid) var uuid
 
+    @ObservableState
     struct State: Equatable {
         var draftTitle = ""
         var searchText = ""

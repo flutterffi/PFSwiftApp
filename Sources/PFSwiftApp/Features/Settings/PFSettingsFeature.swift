@@ -1,6 +1,8 @@
 import ComposableArchitecture
 
-struct PFSettingsFeature: Reducer {
+@Reducer
+struct PFSettingsFeature {
+    @ObservableState
     struct State: Equatable {
         var isAnalyticsEnabled = true
         var isCrashReportingEnabled = true

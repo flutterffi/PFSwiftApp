@@ -7,7 +7,9 @@ enum PFTab: String, CaseIterable, Equatable {
     case settings
 }
 
-struct PFAppFeature: Reducer {
+@Reducer
+struct PFAppFeature {
+    @ObservableState
     struct State: Equatable {
         var selectedTab: PFTab = .dashboard
         var dashboard = PFDashboardFeature.State()
@@ -25,16 +27,16 @@ struct PFAppFeature: Reducer {
     }
 
     var body: some ReducerOf<Self> {
-        Scope(state: \.dashboard, action: /Action.dashboard) {
+        Scope(state: \.dashboard, action: \.dashboard) {
             PFDashboardFeature()
         }
-        Scope(state: \.tasks, action: /Action.tasks) {
+        Scope(state: \.tasks, action: \.tasks) {
             PFTasksFeature()
         }
-        Scope(state: \.messages, action: /Action.messages) {
+        Scope(state: \.messages, action: \.messages) {
             PFMessagesFeature()
         }
-        Scope(state: \.settings, action: /Action.settings) {
+        Scope(state: \.settings, action: \.settings) {
             PFSettingsFeature()
         }
         Reduce { state, action in
