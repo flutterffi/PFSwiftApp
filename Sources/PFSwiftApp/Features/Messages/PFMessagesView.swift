@@ -43,6 +43,26 @@ struct PFMessagesView: View {
                 }
             }
             .navigationTitle("Messages")
+            .overlay {
+                if store.isLoading {
+                    ProgressView()
+                }
+            }
+            .alert(
+                "Message Error",
+                isPresented: Binding(
+                    get: { store.errorMessage != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            store.send(.messageErrorDismissed)
+                        }
+                    }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(store.errorMessage ?? "")
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Mark All Read") {
@@ -50,6 +70,9 @@ struct PFMessagesView: View {
                     }
                     .disabled(store.unreadThreadCount == 0)
                 }
+            }
+            .task {
+                await store.send(.task).finish()
             }
         }
     }

@@ -68,6 +68,8 @@ final class PFAppFeatureTests: XCTestCase {
     func testDashboardMessageSummaryUpdatesAfterMessageAction() async {
         let store = TestStore(initialState: PFAppFeature.State()) {
             PFAppFeature()
+        } withDependencies: {
+            $0.messageClient.saveThreads = { _ in }
         }
 
         await store.send(.messages(.markAllReadButtonTapped)) {
@@ -86,5 +88,6 @@ final class PFAppFeatureTests: XCTestCase {
                 PFDashboardSummary(title: "Crash Reporting", value: "On")
             ]
         }
+        await store.receive(.messages(.saveSucceeded))
     }
 }
