@@ -12,6 +12,7 @@ Swift tools: 6.3
 iOS: 18.0+
 macOS: 15.0+
 Xcode: 26.x
+Swift language mode: 6
 ```
 
 ## Rules
@@ -21,7 +22,22 @@ Xcode: 26.x
 3. Do not raise deployment targets just because a newer OS exists.
 4. Do not add compatibility shims for unsupported OS versions.
 5. Remove deprecated APIs when a modern replacement is available.
-6. Keep tests passing on the current Xcode release.
+6. Keep Swift 6 language mode enabled.
+7. Keep tests passing on the current Xcode release.
+
+## Swift 6 Readiness
+
+The package declares `swiftLanguageModes: [.v6]` so new code is checked in Swift 6 mode by
+default.
+
+Guidelines:
+
+1. Keep dependency clients, models, and async closures `Sendable`.
+2. Prefer actor-isolated state for mutable shared test or preview storage.
+3. Avoid `nonisolated(unsafe)` outside tightly scoped test doubles.
+4. Do not silence concurrency diagnostics with unchecked conformance unless a review note explains
+   the invariant.
+5. Prefer structured concurrency over detached tasks or main queue dispatch.
 
 ## Dependency Policy
 
@@ -56,4 +72,5 @@ Confirm:
 1. Direct dependencies resolve to the latest compatible versions.
 2. Deployment target changes have product or library requirements.
 3. New APIs are available on the current baseline.
-4. Commit message is English.
+4. Swift 6 diagnostics are not silenced without a documented reason.
+5. Commit message is English.

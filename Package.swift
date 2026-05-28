@@ -36,5 +36,6 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         )
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )
