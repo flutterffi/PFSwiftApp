@@ -7,6 +7,7 @@ struct PFDashboardFeature {
         var title = "Operations"
         var taskSummaryItems: [PFDashboardSummary] = [
             PFDashboardSummary(title: "Open Tasks", value: "2"),
+            PFDashboardSummary(title: "High Priority", value: "1"),
             PFDashboardSummary(title: "Done Tasks", value: "1"),
             PFDashboardSummary(title: "Total Tasks", value: "3")
         ]

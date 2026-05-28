@@ -33,6 +33,17 @@ struct PFTasksView: View {
                             text: $store.draftTitle.sending(\.draftTitleChanged)
                         )
 
+                        Picker(
+                            "Priority",
+                            selection: $store.selectedPriority.sending(\.selectedPriorityChanged)
+                        ) {
+                            ForEach(PFTaskPriority.allCases) { priority in
+                                Text(priority.rawValue).tag(priority)
+                            }
+                        }
+                        .labelsHidden()
+                        .frame(maxWidth: 120)
+
                         Button {
                             store.send(.addButtonTapped)
                         } label: {
@@ -55,7 +66,21 @@ struct PFTasksView: View {
                                 Text(task.title)
                                     .strikethrough(task.isCompleted)
                                     .foregroundStyle(task.isCompleted ? .secondary : .primary)
+                                Text(task.priority.rawValue)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                                 Spacer()
+
+                                Menu {
+                                    ForEach(PFTaskPriority.allCases) { priority in
+                                        Button(priority.rawValue) {
+                                            store.send(.priorityChanged(task.id, priority))
+                                        }
+                                    }
+                                } label: {
+                                    Image(systemName: "flag")
+                                }
+                                .buttonStyle(.borderless)
                             }
                             .contentShape(Rectangle())
                         }

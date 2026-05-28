@@ -13,6 +13,7 @@ struct PFTasksFeature {
         var isLoading = false
         var searchText = ""
         var selectedFilter: PFTaskFilter = .all
+        var selectedPriority: PFTaskPriority = .medium
         var tasks: IdentifiedArrayOf<PFTaskItem> = IdentifiedArray(uniqueElements: PFTaskItem.defaults)
 
         var activeTaskCount: Int {
@@ -21,6 +22,10 @@ struct PFTasksFeature {
 
         var completedTaskCount: Int {
             tasks.filter(\.isCompleted).count
+        }
+
+        var highPriorityTaskCount: Int {
+            tasks.filter { !$0.isCompleted && $0.priority == .high }.count
         }
 
         var canAddTask: Bool {
@@ -40,14 +45,23 @@ struct PFTasksFeature {
 
             let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !query.isEmpty else {
-                return IdentifiedArray(uniqueElements: filteredTasks)
+                return IdentifiedArray(uniqueElements: sort(filteredTasks))
             }
 
             return IdentifiedArray(
-                uniqueElements: filteredTasks.filter {
+                uniqueElements: sort(filteredTasks.filter {
                     $0.title.localizedCaseInsensitiveContains(query)
-                }
+                })
             )
+        }
+
+        private func sort(_ tasks: [PFTaskItem]) -> [PFTaskItem] {
+            tasks.sorted {
+                if $0.priority != $1.priority {
+                    return $0.priority.sortRank < $1.priority.sortRank
+                }
+                return $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+            }
         }
     }
 
@@ -58,6 +72,8 @@ struct PFTasksFeature {
         case filterChanged(PFTaskFilter)
         case draftTitleChanged(String)
         case addButtonTapped
+        case priorityChanged(PFTaskItem.ID, PFTaskPriority)
+        case selectedPriorityChanged(PFTaskPriority)
         case taskCompletionToggled(PFTaskItem.ID)
         case delete(IndexSet)
         case clearCompletedButtonTapped
@@ -110,9 +126,17 @@ struct PFTasksFeature {
                 guard !title.isEmpty else {
                     return .none
                 }
-                state.tasks.append(PFTaskItem(id: uuid(), title: title))
+                state.tasks.append(PFTaskItem(id: uuid(), title: title, priority: state.selectedPriority))
                 state.draftTitle = ""
                 return save(state.tasks)
+
+            case let .priorityChanged(id, priority):
+                state.tasks[id: id]?.priority = priority
+                return save(state.tasks)
+
+            case let .selectedPriorityChanged(priority):
+                state.selectedPriority = priority
+                return .none
 
             case let .taskCompletionToggled(id):
                 state.tasks[id: id]?.isCompleted.toggle()
@@ -172,16 +196,44 @@ struct PFTaskItem: Equatable, Identifiable {
     let id: UUID
     var title: String
     var isCompleted: Bool
+    var priority: PFTaskPriority
 
-    init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
+    init(
+        id: UUID = UUID(),
+        title: String,
+        isCompleted: Bool = false,
+        priority: PFTaskPriority = .medium
+    ) {
         self.id = id
         self.title = title
         self.isCompleted = isCompleted
+        self.priority = priority
     }
 
     static let defaults = [
-        PFTaskItem(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, title: "Review architecture", isCompleted: true),
-        PFTaskItem(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, title: "Prepare release tag"),
-        PFTaskItem(id: UUID(uuidString: "33333333-3333-3333-3333-333333333333")!, title: "Validate core flow")
+        PFTaskItem(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, title: "Review architecture", isCompleted: true, priority: .high),
+        PFTaskItem(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, title: "Prepare release tag", priority: .high),
+        PFTaskItem(id: UUID(uuidString: "33333333-3333-3333-3333-333333333333")!, title: "Validate core flow", priority: .medium)
     ]
+}
+
+enum PFTaskPriority: String, CaseIterable, Equatable, Identifiable {
+    case high = "High"
+    case medium = "Medium"
+    case low = "Low"
+
+    var id: String {
+        rawValue
+    }
+
+    var sortRank: Int {
+        switch self {
+        case .high:
+            return 0
+        case .medium:
+            return 1
+        case .low:
+            return 2
+        }
+    }
 }

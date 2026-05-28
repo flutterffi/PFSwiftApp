@@ -38,15 +38,18 @@ final class PFTasksFeatureTests: XCTestCase {
         await store.send(.draftTitleChanged("Ship baseline")) {
             $0.draftTitle = "Ship baseline"
         }
+        await store.send(.selectedPriorityChanged(.high)) {
+            $0.selectedPriority = .high
+        }
         await store.send(.addButtonTapped) {
             $0.draftTitle = ""
             $0.tasks = [
-                PFTaskItem(id: taskID, title: "Ship baseline")
+                PFTaskItem(id: taskID, title: "Ship baseline", priority: .high)
             ]
         }
         await store.receive(.saveSucceeded)
         let savedTasks = await recorder.savedTasks()
-        XCTAssertEqual(savedTasks, [PFTaskItem(id: taskID, title: "Ship baseline")])
+        XCTAssertEqual(savedTasks, [PFTaskItem(id: taskID, title: "Ship baseline", priority: .high)])
     }
 
     func testToggleAndClearCompletedTasks() async {
@@ -157,6 +160,54 @@ final class PFTasksFeatureTests: XCTestCase {
             store.state.visibleTasks,
             [
                 PFTaskItem(id: activeID, title: "Prepare release")
+            ]
+        )
+    }
+
+    func testPriorityChangeSavesTasks() async {
+        let taskID = UUID(uuidString: "45678901-4567-4567-4567-456789012345")!
+        let recorder = PFTaskSaveRecorder()
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                tasks: [
+                    PFTaskItem(id: taskID, title: "Prioritize task", priority: .low)
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        } withDependencies: {
+            $0.taskClient.saveTasks = { tasks in
+                await recorder.save(tasks)
+            }
+        }
+
+        await store.send(.priorityChanged(taskID, .high)) {
+            $0.tasks[id: taskID]?.priority = .high
+        }
+        await store.receive(.saveSucceeded)
+        let savedTasks = await recorder.savedTasks()
+        XCTAssertEqual(savedTasks, [PFTaskItem(id: taskID, title: "Prioritize task", priority: .high)])
+    }
+
+    func testVisibleTasksSortByPriority() async {
+        let highID = UUID(uuidString: "56789012-5678-5678-5678-567890123456")!
+        let lowID = UUID(uuidString: "67890123-6789-6789-6789-678901234567")!
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                tasks: [
+                    PFTaskItem(id: lowID, title: "Low task", priority: .low),
+                    PFTaskItem(id: highID, title: "High task", priority: .high)
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        }
+
+        XCTAssertEqual(
+            store.state.visibleTasks,
+            [
+                PFTaskItem(id: highID, title: "High task", priority: .high),
+                PFTaskItem(id: lowID, title: "Low task", priority: .low)
             ]
         )
     }
