@@ -6,8 +6,8 @@ This document records the latest deprecated API audit for the current platform b
 
 ```text
 Swift tools: 6.3
-iOS: 26.0+
-macOS: 26.0+
+iOS: 18.0+
+macOS: 15.0+
 Xcode: 26.5
 Swift: 6.3.2
 ```
@@ -66,6 +66,6 @@ Tests may use Foundation primitives such as `URL(string:)` and `JSONSerializatio
 1. Prefer `NavigationStack` over `NavigationView`.
 2. Prefer generated `PFAsset` and `PFStrings` accessors over raw resource strings.
 3. Prefer latest-compatible package ranges over exact pins.
-4. Do not add old-platform availability fallbacks.
+4. Do not raise deployment targets just because a newer OS exists.
 5. Keep JSON coding policy inside `PFAPIJSONCoding`.
 6. Treat compiler deprecation warnings as failures unless a short migration note is added here.

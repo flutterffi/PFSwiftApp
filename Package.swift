@@ -6,8 +6,8 @@ let package = Package(
     name: "PFSwiftApp",
     defaultLocalization: "en",
     platforms: [
-        .iOS("26.0"),
-        .macOS("26.0")
+        .iOS("18.0"),
+        .macOS("15.0")
     ],
     products: [
         .executable(name: "PFSwiftApp", targets: ["PFSwiftApp"])
