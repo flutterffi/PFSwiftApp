@@ -19,3 +19,7 @@ Resource workflow, SwiftGen usage, naming rules, and replacement order are docum
 ## Platform Policy
 
 This project follows a latest-platform-first policy. Deployment targets and dependency rules are documented in [PFPlatformPolicy.md](Docs/PFPlatformPolicy.md).
+
+## API Modernization
+
+Deprecated API audit notes and review rules are documented in [PFModernAPIAudit.md](Docs/PFModernAPIAudit.md).
