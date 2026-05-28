@@ -90,6 +90,7 @@ struct PFAppFeature {
             ],
             messageSummaryItems: [
                 PFDashboardSummary(title: "Unread Messages", value: "\(messages.unreadThreadCount)"),
+                PFDashboardSummary(title: "Pinned Messages", value: "\(messages.pinnedThreadCount)"),
                 PFDashboardSummary(title: "Total Messages", value: "\(messages.threads.count)")
             ],
             systemSummaryItems: [

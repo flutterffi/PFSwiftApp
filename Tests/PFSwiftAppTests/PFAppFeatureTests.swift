@@ -31,6 +31,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.messageSummaryItems = [
                 PFDashboardSummary(title: "Unread Messages", value: "1"),
+                PFDashboardSummary(title: "Pinned Messages", value: "1"),
                 PFDashboardSummary(title: "Total Messages", value: "2")
             ]
             $0.dashboard.systemSummaryItems = [
@@ -60,6 +61,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.messageSummaryItems = [
                 PFDashboardSummary(title: "Unread Messages", value: "1"),
+                PFDashboardSummary(title: "Pinned Messages", value: "1"),
                 PFDashboardSummary(title: "Total Messages", value: "2")
             ]
             $0.dashboard.systemSummaryItems = [
@@ -89,6 +91,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.messageSummaryItems = [
                 PFDashboardSummary(title: "Unread Messages", value: "0"),
+                PFDashboardSummary(title: "Pinned Messages", value: "1"),
                 PFDashboardSummary(title: "Total Messages", value: "2")
             ]
             $0.dashboard.systemSummaryItems = [
@@ -118,6 +121,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.messageSummaryItems = [
                 PFDashboardSummary(title: "Unread Messages", value: "1"),
+                PFDashboardSummary(title: "Pinned Messages", value: "1"),
                 PFDashboardSummary(title: "Total Messages", value: "2")
             ]
             $0.dashboard.systemSummaryItems = [

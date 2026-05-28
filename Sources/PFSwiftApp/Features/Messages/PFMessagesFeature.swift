@@ -14,12 +14,31 @@ struct PFMessagesFeature {
         var unreadThreadCount: Int {
             threads.filter(\.isUnread).count
         }
+
+        var pinnedThreadCount: Int {
+            threads.filter(\.isPinned).count
+        }
+
+        var visibleThreads: IdentifiedArrayOf<PFMessageThread> {
+            IdentifiedArray(
+                uniqueElements: threads.sorted {
+                    if $0.isPinned != $1.isPinned {
+                        return $0.isPinned && !$1.isPinned
+                    }
+                    if $0.isUnread != $1.isUnread {
+                        return $0.isUnread && !$1.isUnread
+                    }
+                    return $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+                }
+            )
+        }
     }
 
     enum Action: Equatable {
         case loadResponse(Result<[PFMessageThread], PFMessageClientError>)
         case markAllReadButtonTapped
         case messageErrorDismissed
+        case pinToggled(PFMessageThread.ID)
         case saveFailed(PFMessageClientError)
         case saveSucceeded
         case task
@@ -50,6 +69,10 @@ struct PFMessagesFeature {
             case .messageErrorDismissed:
                 state.errorMessage = nil
                 return .none
+
+            case let .pinToggled(id):
+                state.threads[id: id]?.isPinned.toggle()
+                return save(state.threads)
 
             case let .saveFailed(error):
                 state.errorMessage = error.message
@@ -102,16 +125,18 @@ struct PFMessageThread: Equatable, Identifiable {
     var title: String
     var preview: String
     var isUnread: Bool
+    var isPinned: Bool
 
-    init(id: String? = nil, title: String, preview: String, isUnread: Bool = false) {
+    init(id: String? = nil, title: String, preview: String, isUnread: Bool = false, isPinned: Bool = false) {
         self.id = id ?? title
         self.title = title
         self.preview = preview
         self.isUnread = isUnread
+        self.isPinned = isPinned
     }
 
     static let defaults = [
-        PFMessageThread(title: "Platform", preview: "Architecture baseline is ready.", isUnread: false),
+        PFMessageThread(title: "Platform", preview: "Architecture baseline is ready.", isUnread: false, isPinned: true),
         PFMessageThread(title: "Release", preview: "Tag preparation is queued.", isUnread: true)
     ]
 }

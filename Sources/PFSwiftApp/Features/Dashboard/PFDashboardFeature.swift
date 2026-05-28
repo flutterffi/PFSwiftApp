@@ -14,6 +14,7 @@ struct PFDashboardFeature {
         ]
         var messageSummaryItems: [PFDashboardSummary] = [
             PFDashboardSummary(title: "Unread Messages", value: "1"),
+            PFDashboardSummary(title: "Pinned Messages", value: "1"),
             PFDashboardSummary(title: "Total Messages", value: "2")
         ]
         var systemSummaryItems: [PFDashboardSummary] = [

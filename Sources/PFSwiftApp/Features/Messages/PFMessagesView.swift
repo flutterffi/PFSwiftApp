@@ -8,7 +8,7 @@ struct PFMessagesView: View {
         NavigationStack {
             List {
                 Section {
-                    ForEach(store.threads) { thread in
+                    ForEach(store.visibleThreads) { thread in
                         Button {
                             store.send(.threadTapped(thread.id))
                         } label: {
@@ -18,14 +18,28 @@ struct PFMessagesView: View {
                                     .foregroundStyle(thread.isUnread ? .blue : .secondary)
 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(thread.title)
-                                        .font(.headline)
+                                    HStack(spacing: 6) {
+                                        Text(thread.title)
+                                            .font(.headline)
+                                        if thread.isPinned {
+                                            Image(systemName: "pin.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(.orange)
+                                        }
+                                    }
                                     Text(thread.preview)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
 
                                 Spacer()
+
+                                Button {
+                                    store.send(.pinToggled(thread.id))
+                                } label: {
+                                    Image(systemName: thread.isPinned ? "pin.slash" : "pin")
+                                }
+                                .buttonStyle(.borderless)
 
                                 Button {
                                     store.send(.unreadToggled(thread.id))
@@ -40,6 +54,8 @@ struct PFMessagesView: View {
                     }
                 } header: {
                     Text("\(store.unreadThreadCount) Unread")
+                } footer: {
+                    Text("\(store.pinnedThreadCount) Pinned")
                 }
             }
             .navigationTitle("Messages")
