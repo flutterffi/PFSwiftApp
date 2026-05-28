@@ -14,6 +14,7 @@ struct PFTasksFeature {
         var searchText = ""
         var selectedFilter: PFTaskFilter = .all
         var selectedDueDate: PFTaskDueDate = .none
+        var selectedDueDateFilter: PFTaskDueDateFilter = .all
         var selectedPriority: PFTaskPriority = .medium
         var tasks: IdentifiedArrayOf<PFTaskItem> = IdentifiedArray(uniqueElements: PFTaskItem.defaults)
 
@@ -48,13 +49,17 @@ struct PFTasksFeature {
                 filteredTasks = tasks.filter(\.isCompleted)
             }
 
+            let dueDateFilteredTasks = filteredTasks.filter {
+                selectedDueDateFilter.includes($0.dueDate)
+            }
+
             let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !query.isEmpty else {
-                return IdentifiedArray(uniqueElements: sort(filteredTasks))
+                return IdentifiedArray(uniqueElements: sort(dueDateFilteredTasks))
             }
 
             return IdentifiedArray(
-                uniqueElements: sort(filteredTasks.filter {
+                uniqueElements: sort(dueDateFilteredTasks.filter {
                     $0.title.localizedCaseInsensitiveContains(query)
                 })
             )
@@ -81,6 +86,7 @@ struct PFTasksFeature {
         case draftTitleChanged(String)
         case addButtonTapped
         case dueDateChanged(PFTaskItem.ID, PFTaskDueDate)
+        case dueDateFilterChanged(PFTaskDueDateFilter)
         case priorityChanged(PFTaskItem.ID, PFTaskPriority)
         case selectedDueDateChanged(PFTaskDueDate)
         case selectedPriorityChanged(PFTaskPriority)
@@ -151,6 +157,10 @@ struct PFTasksFeature {
                 state.tasks[id: id]?.dueDate = dueDate
                 return save(state.tasks)
 
+            case let .dueDateFilterChanged(filter):
+                state.selectedDueDateFilter = filter
+                return .none
+
             case let .priorityChanged(id, priority):
                 state.tasks[id: id]?.priority = priority
                 return save(state.tasks)
@@ -214,6 +224,30 @@ enum PFTaskFilter: String, CaseIterable, Equatable, Identifiable {
 
     var id: String {
         rawValue
+    }
+}
+
+enum PFTaskDueDateFilter: String, CaseIterable, Equatable, Identifiable {
+    case all = "All Dates"
+    case dueSoon = "Due Soon"
+    case scheduled = "Scheduled"
+    case noDate = "No Date"
+
+    var id: String {
+        rawValue
+    }
+
+    func includes(_ dueDate: PFTaskDueDate) -> Bool {
+        switch self {
+        case .all:
+            return true
+        case .dueSoon:
+            return dueDate.isDueSoon
+        case .scheduled:
+            return dueDate != .none
+        case .noDate:
+            return dueDate == .none
+        }
     }
 }
 

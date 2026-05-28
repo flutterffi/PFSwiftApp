@@ -15,15 +15,26 @@ struct PFTasksView: View {
                 }
 
                 Section {
-                    Picker(
-                        "Filter",
-                        selection: $store.selectedFilter.sending(\.filterChanged)
-                    ) {
-                        ForEach(PFTaskFilter.allCases) { filter in
-                            Text(filter.rawValue).tag(filter)
+                    VStack(alignment: .leading, spacing: 12) {
+                        Picker(
+                            "Filter",
+                            selection: $store.selectedFilter.sending(\.filterChanged)
+                        ) {
+                            ForEach(PFTaskFilter.allCases) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+
+                        Picker(
+                            "Due Date",
+                            selection: $store.selectedDueDateFilter.sending(\.dueDateFilterChanged)
+                        ) {
+                            ForEach(PFTaskDueDateFilter.allCases) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
                         }
                     }
-                    .pickerStyle(.segmented)
                 }
 
                 Section {

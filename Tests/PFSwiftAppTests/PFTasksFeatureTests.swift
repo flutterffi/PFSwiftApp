@@ -167,6 +167,58 @@ final class PFTasksFeatureTests: XCTestCase {
         )
     }
 
+    func testDueDateFilterShowsDueSoonTasks() async {
+        let todayID = UUID(uuidString: "ABCDABCD-ABCD-ABCD-ABCD-ABCDABCDABCD")!
+        let weekID = UUID(uuidString: "BCADBCAD-BCAD-BCAD-BCAD-BCADBCADBCAD")!
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                tasks: [
+                    PFTaskItem(id: weekID, title: "Weekly task", dueDate: .thisWeek),
+                    PFTaskItem(id: todayID, title: "Today task", dueDate: .today)
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        }
+
+        await store.send(.dueDateFilterChanged(.dueSoon)) {
+            $0.selectedDueDateFilter = .dueSoon
+        }
+        XCTAssertEqual(
+            store.state.visibleTasks,
+            [
+                PFTaskItem(id: todayID, title: "Today task", dueDate: .today)
+            ]
+        )
+    }
+
+    func testDueDateFilterCombinesWithSearchAndStatus() async {
+        let activeID = UUID(uuidString: "CDEF1234-CDEF-1234-CDEF-1234CDEF1234")!
+        let doneID = UUID(uuidString: "DEF12345-DEF1-2345-DEF1-2345DEF12345")!
+        let noDateID = UUID(uuidString: "EF123456-EF12-3456-EF12-3456EF123456")!
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                searchText: "release",
+                selectedFilter: .active,
+                selectedDueDateFilter: .scheduled,
+                tasks: [
+                    PFTaskItem(id: activeID, title: "Release task", dueDate: .thisWeek),
+                    PFTaskItem(id: doneID, title: "Release done", isCompleted: true, dueDate: .today),
+                    PFTaskItem(id: noDateID, title: "Release unscheduled")
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        }
+
+        XCTAssertEqual(
+            store.state.visibleTasks,
+            [
+                PFTaskItem(id: activeID, title: "Release task", dueDate: .thisWeek)
+            ]
+        )
+    }
+
     func testPriorityChangeSavesTasks() async {
         let taskID = UUID(uuidString: "45678901-4567-4567-4567-456789012345")!
         let recorder = PFTaskSaveRecorder()
