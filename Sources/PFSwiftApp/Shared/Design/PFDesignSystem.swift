@@ -30,6 +30,14 @@ enum PFPalette {
     static let primary = PFAsset.pfPrimary.swiftUIColor
     static let success = PFAsset.pfSuccess.swiftUIColor
     static let warning = PFAsset.pfWarning.swiftUIColor
+
+    static func rgb(red: Int, green: Int, blue: Int, opacity: Double = 1) -> Color {
+        PFColorToken.rgb(red: red, green: green, blue: blue, opacity: opacity).swiftUIColor
+    }
+
+    static func hex(_ value: String, opacity: Double = 1) -> Color? {
+        PFColorToken.hex(value, opacity: opacity)?.swiftUIColor
+    }
 }
 
 extension View {
