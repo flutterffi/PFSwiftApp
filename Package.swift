@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.2"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", exact: "1.25.5")
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.5")
     ],
     targets: [
         .executableTarget(
