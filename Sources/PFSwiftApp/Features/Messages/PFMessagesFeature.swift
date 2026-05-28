@@ -137,7 +137,7 @@ struct PFMessagesFeature {
     }
 }
 
-struct PFMessageThread: Equatable, Identifiable {
+struct PFMessageThread: Equatable, Identifiable, Sendable {
     let id: String
     var title: String
     var preview: String

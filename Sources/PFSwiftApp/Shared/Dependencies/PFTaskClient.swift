@@ -129,5 +129,3 @@ private struct PFTaskRequest: Encodable, Sendable {
         self.dueDate = taskItem.dueDate
     }
 }
-
-private struct PFEmptyResponse: Decodable, Sendable {}

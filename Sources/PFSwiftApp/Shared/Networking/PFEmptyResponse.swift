@@ -1,0 +1,1 @@
+struct PFEmptyResponse: Decodable, Sendable {}
