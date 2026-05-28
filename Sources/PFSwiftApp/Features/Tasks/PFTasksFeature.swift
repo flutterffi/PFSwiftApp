@@ -279,7 +279,7 @@ struct PFTaskItem: Equatable, Identifiable {
     ]
 }
 
-enum PFTaskDueDate: String, CaseIterable, Equatable, Identifiable {
+enum PFTaskDueDate: String, CaseIterable, Decodable, Encodable, Equatable, Identifiable, Sendable {
     case none = "No Date"
     case today = "Today"
     case tomorrow = "Tomorrow"
@@ -312,7 +312,7 @@ enum PFTaskDueDate: String, CaseIterable, Equatable, Identifiable {
     }
 }
 
-enum PFTaskPriority: String, CaseIterable, Equatable, Identifiable {
+enum PFTaskPriority: String, CaseIterable, Decodable, Encodable, Equatable, Identifiable, Sendable {
     case high = "High"
     case medium = "Medium"
     case low = "Low"
