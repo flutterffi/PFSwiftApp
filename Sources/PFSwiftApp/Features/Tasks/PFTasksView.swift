@@ -85,7 +85,7 @@ struct PFTasksView: View {
                         } label: {
                             HStack(spacing: 12) {
                                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(task.isCompleted ? .green : .secondary)
+                                    .foregroundStyle(task.isCompleted ? PFAsset.pfSuccess.swiftUIColor : .secondary)
                                 Text(task.title)
                                     .strikethrough(task.isCompleted)
                                     .foregroundStyle(task.isCompleted ? .secondary : .primary)
@@ -132,7 +132,7 @@ struct PFTasksView: View {
                     Text("\(store.activeTaskCount) Active")
                 } footer: {
                     if store.visibleTasks.isEmpty {
-                        Text(PFStrings.Tasks.Empty.title)
+                        PFEmptyStateView(title: PFStrings.Tasks.Empty.title)
                     }
                 }
             }

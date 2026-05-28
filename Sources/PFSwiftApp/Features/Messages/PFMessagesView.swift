@@ -22,7 +22,7 @@ struct PFMessagesView: View {
                             HStack(spacing: 12) {
                                 Image(systemName: thread.isUnread ? "circle.fill" : "circle")
                                     .font(.caption)
-                                    .foregroundStyle(thread.isUnread ? .blue : .secondary)
+                                    .foregroundStyle(thread.isUnread ? PFAsset.pfPrimary.swiftUIColor : .secondary)
 
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack(spacing: 6) {
@@ -31,7 +31,7 @@ struct PFMessagesView: View {
                                         if thread.isPinned {
                                             Image(systemName: "pin.fill")
                                                 .font(.caption)
-                                                .foregroundStyle(.orange)
+                                                .foregroundStyle(PFAsset.pfWarning.swiftUIColor)
                                         }
                                     }
                                     Text(thread.preview)
@@ -63,7 +63,7 @@ struct PFMessagesView: View {
                     Text("\(store.unreadThreadCount) Unread")
                 } footer: {
                     if store.visibleThreads.isEmpty {
-                        Text(PFStrings.Messages.Empty.title)
+                        PFEmptyStateView(title: PFStrings.Messages.Empty.title)
                     } else {
                         Text("\(store.pinnedThreadCount) Pinned")
                     }

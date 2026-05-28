@@ -46,6 +46,7 @@ struct PFAppView: View {
             }
             .tag(PFTab.settings)
         }
+        .tint(PFAsset.pfPrimary.swiftUIColor)
         .preferredColorScheme(store.settings.themeMode.colorScheme)
     }
 }
