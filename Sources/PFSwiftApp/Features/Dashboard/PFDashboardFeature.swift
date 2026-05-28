@@ -5,10 +5,14 @@ struct PFDashboardFeature {
     @ObservableState
     struct State: Equatable {
         var title = "Operations"
-        var summaryItems: [PFDashboardSummary] = [
+        var taskSummaryItems: [PFDashboardSummary] = [
             PFDashboardSummary(title: "Open Tasks", value: "2"),
             PFDashboardSummary(title: "Done Tasks", value: "1"),
             PFDashboardSummary(title: "Total Tasks", value: "3")
+        ]
+        var systemSummaryItems: [PFDashboardSummary] = [
+            PFDashboardSummary(title: "Analytics", value: "On"),
+            PFDashboardSummary(title: "Crash Reporting", value: "On")
         ]
     }
 

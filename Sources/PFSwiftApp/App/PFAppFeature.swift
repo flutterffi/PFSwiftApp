@@ -46,16 +46,33 @@ struct PFAppFeature {
                 return .none
 
             case .tasks:
-                state.dashboard.summaryItems = [
-                    PFDashboardSummary(title: "Open Tasks", value: "\(state.tasks.activeTaskCount)"),
-                    PFDashboardSummary(title: "Done Tasks", value: "\(state.tasks.completedTaskCount)"),
-                    PFDashboardSummary(title: "Total Tasks", value: "\(state.tasks.tasks.count)")
-                ]
+                state.dashboard = Self.dashboardState(tasks: state.tasks, settings: state.settings)
                 return .none
 
-            case .dashboard, .messages, .settings:
+            case .settings:
+                state.dashboard = Self.dashboardState(tasks: state.tasks, settings: state.settings)
+                return .none
+
+            case .dashboard, .messages:
                 return .none
             }
         }
+    }
+
+    private static func dashboardState(
+        tasks: PFTasksFeature.State,
+        settings: PFSettingsFeature.State
+    ) -> PFDashboardFeature.State {
+        PFDashboardFeature.State(
+            taskSummaryItems: [
+                PFDashboardSummary(title: "Open Tasks", value: "\(tasks.activeTaskCount)"),
+                PFDashboardSummary(title: "Done Tasks", value: "\(tasks.completedTaskCount)"),
+                PFDashboardSummary(title: "Total Tasks", value: "\(tasks.tasks.count)")
+            ],
+            systemSummaryItems: [
+                PFDashboardSummary(title: "Analytics", value: settings.isAnalyticsEnabled ? "On" : "Off"),
+                PFDashboardSummary(title: "Crash Reporting", value: settings.isCrashReportingEnabled ? "On" : "Off")
+            ]
+        )
     }
 }
