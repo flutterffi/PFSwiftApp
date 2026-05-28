@@ -10,6 +10,10 @@ struct PFDashboardFeature {
             PFDashboardSummary(title: "Done Tasks", value: "1"),
             PFDashboardSummary(title: "Total Tasks", value: "3")
         ]
+        var messageSummaryItems: [PFDashboardSummary] = [
+            PFDashboardSummary(title: "Unread Messages", value: "1"),
+            PFDashboardSummary(title: "Total Messages", value: "2")
+        ]
         var systemSummaryItems: [PFDashboardSummary] = [
             PFDashboardSummary(title: "Analytics", value: "On"),
             PFDashboardSummary(title: "Crash Reporting", value: "On")

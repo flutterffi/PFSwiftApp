@@ -13,6 +13,12 @@ struct PFDashboardView: View {
                     }
                 }
 
+                Section("Messages") {
+                    ForEach(store.messageSummaryItems) { item in
+                        PFDashboardSummaryRow(item: item)
+                    }
+                }
+
                 Section("System") {
                     ForEach(store.systemSummaryItems) { item in
                         PFDashboardSummaryRow(item: item)

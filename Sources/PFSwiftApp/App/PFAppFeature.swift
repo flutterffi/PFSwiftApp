@@ -46,14 +46,30 @@ struct PFAppFeature {
                 return .none
 
             case .tasks:
-                state.dashboard = Self.dashboardState(tasks: state.tasks, settings: state.settings)
+                state.dashboard = Self.dashboardState(
+                    tasks: state.tasks,
+                    messages: state.messages,
+                    settings: state.settings
+                )
                 return .none
 
             case .settings:
-                state.dashboard = Self.dashboardState(tasks: state.tasks, settings: state.settings)
+                state.dashboard = Self.dashboardState(
+                    tasks: state.tasks,
+                    messages: state.messages,
+                    settings: state.settings
+                )
                 return .none
 
-            case .dashboard, .messages:
+            case .messages:
+                state.dashboard = Self.dashboardState(
+                    tasks: state.tasks,
+                    messages: state.messages,
+                    settings: state.settings
+                )
+                return .none
+
+            case .dashboard:
                 return .none
             }
         }
@@ -61,6 +77,7 @@ struct PFAppFeature {
 
     private static func dashboardState(
         tasks: PFTasksFeature.State,
+        messages: PFMessagesFeature.State = PFMessagesFeature.State(),
         settings: PFSettingsFeature.State
     ) -> PFDashboardFeature.State {
         PFDashboardFeature.State(
@@ -68,6 +85,10 @@ struct PFAppFeature {
                 PFDashboardSummary(title: "Open Tasks", value: "\(tasks.activeTaskCount)"),
                 PFDashboardSummary(title: "Done Tasks", value: "\(tasks.completedTaskCount)"),
                 PFDashboardSummary(title: "Total Tasks", value: "\(tasks.tasks.count)")
+            ],
+            messageSummaryItems: [
+                PFDashboardSummary(title: "Unread Messages", value: "\(messages.unreadThreadCount)"),
+                PFDashboardSummary(title: "Total Messages", value: "\(messages.threads.count)")
             ],
             systemSummaryItems: [
                 PFDashboardSummary(title: "Analytics", value: settings.isAnalyticsEnabled ? "On" : "Off"),
