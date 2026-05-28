@@ -16,6 +16,8 @@ final class PFAppFeatureTests: XCTestCase {
             )
         ) {
             PFAppFeature()
+        } withDependencies: {
+            $0.taskClient.saveTasks = { _ in }
         }
 
         await store.send(.tasks(.taskCompletionToggled(taskID))) {
@@ -26,5 +28,6 @@ final class PFAppFeatureTests: XCTestCase {
                 PFDashboardSummary(title: "Total Tasks", value: "1")
             ]
         }
+        await store.receive(.tasks(.saveSucceeded))
     }
 }

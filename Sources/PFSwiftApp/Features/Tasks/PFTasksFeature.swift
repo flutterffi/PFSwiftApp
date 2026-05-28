@@ -3,18 +3,17 @@ import Foundation
 
 @Reducer
 struct PFTasksFeature {
+    @Dependency(\.taskClient) var taskClient
     @Dependency(\.uuid) var uuid
 
     @ObservableState
     struct State: Equatable {
         var draftTitle = ""
+        var errorMessage: String?
+        var isLoading = false
         var searchText = ""
         var selectedFilter: PFTaskFilter = .all
-        var tasks: IdentifiedArrayOf<PFTaskItem> = [
-            PFTaskItem(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, title: "Review architecture", isCompleted: true),
-            PFTaskItem(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, title: "Prepare release tag"),
-            PFTaskItem(id: UUID(uuidString: "33333333-3333-3333-3333-333333333333")!, title: "Validate core flow")
-        ]
+        var tasks: IdentifiedArrayOf<PFTaskItem> = IdentifiedArray(uniqueElements: PFTaskItem.defaults)
 
         var activeTaskCount: Int {
             tasks.filter { !$0.isCompleted }.count
@@ -53,6 +52,8 @@ struct PFTasksFeature {
     }
 
     enum Action: Equatable {
+        case task
+        case loadResponse(Result<[PFTaskItem], PFTaskClientError>)
         case searchTextChanged(String)
         case filterChanged(PFTaskFilter)
         case draftTitleChanged(String)
@@ -60,11 +61,38 @@ struct PFTasksFeature {
         case taskCompletionToggled(PFTaskItem.ID)
         case delete(IndexSet)
         case clearCompletedButtonTapped
+        case saveFailed(PFTaskClientError)
+        case saveSucceeded
+        case taskErrorDismissed
     }
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .task:
+                state.errorMessage = nil
+                state.isLoading = true
+                return .run { send in
+                    await send(
+                        .loadResponse(
+                            Result {
+                                try await taskClient.fetchTasks()
+                            }
+                            .mapError(PFTaskClientError.init)
+                        )
+                    )
+                }
+
+            case let .loadResponse(.success(tasks)):
+                state.isLoading = false
+                state.tasks = IdentifiedArray(uniqueElements: tasks)
+                return .none
+
+            case let .loadResponse(.failure(error)):
+                state.errorMessage = error.message
+                state.isLoading = false
+                return .none
+
             case let .searchTextChanged(searchText):
                 state.searchText = searchText
                 return .none
@@ -84,11 +112,11 @@ struct PFTasksFeature {
                 }
                 state.tasks.append(PFTaskItem(id: uuid(), title: title))
                 state.draftTitle = ""
-                return .none
+                return save(state.tasks)
 
             case let .taskCompletionToggled(id):
                 state.tasks[id: id]?.isCompleted.toggle()
-                return .none
+                return save(state.tasks)
 
             case let .delete(indexSet):
                 let visibleIDs = indexSet.compactMap { index in
@@ -97,11 +125,34 @@ struct PFTasksFeature {
                 for id in visibleIDs {
                     state.tasks.remove(id: id)
                 }
-                return .none
+                return save(state.tasks)
 
             case .clearCompletedButtonTapped:
                 state.tasks.removeAll { $0.isCompleted }
+                return save(state.tasks)
+
+            case let .saveFailed(error):
+                state.errorMessage = error.message
                 return .none
+
+            case .saveSucceeded:
+                return .none
+
+            case .taskErrorDismissed:
+                state.errorMessage = nil
+                return .none
+            }
+        }
+    }
+
+    private func save(_ tasks: IdentifiedArrayOf<PFTaskItem>) -> Effect<Action> {
+        let tasks = Array(tasks)
+        return .run { send in
+            do {
+                try await taskClient.saveTasks(tasks)
+                await send(.saveSucceeded)
+            } catch {
+                await send(.saveFailed(PFTaskClientError(error)))
             }
         }
     }
@@ -127,4 +178,10 @@ struct PFTaskItem: Equatable, Identifiable {
         self.title = title
         self.isCompleted = isCompleted
     }
+
+    static let defaults = [
+        PFTaskItem(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, title: "Review architecture", isCompleted: true),
+        PFTaskItem(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, title: "Prepare release tag"),
+        PFTaskItem(id: UUID(uuidString: "33333333-3333-3333-3333-333333333333")!, title: "Validate core flow")
+    ]
 }

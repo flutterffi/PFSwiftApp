@@ -73,12 +73,35 @@ struct PFTasksView: View {
                 }
             }
             .navigationTitle("Tasks")
+            .overlay {
+                if store.isLoading {
+                    ProgressView()
+                }
+            }
+            .alert(
+                "Task Error",
+                isPresented: Binding(
+                    get: { store.errorMessage != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            store.send(.taskErrorDismissed)
+                        }
+                    }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(store.errorMessage ?? "")
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Clear Done") {
                         store.send(.clearCompletedButtonTapped)
                     }
                 }
+            }
+            .task {
+                await store.send(.task).finish()
             }
         }
     }
