@@ -13,6 +13,7 @@ struct PFTasksFeature {
         var isLoading = false
         var searchText = ""
         var selectedFilter: PFTaskFilter = .all
+        var selectedDueDate: PFTaskDueDate = .none
         var selectedPriority: PFTaskPriority = .medium
         var tasks: IdentifiedArrayOf<PFTaskItem> = IdentifiedArray(uniqueElements: PFTaskItem.defaults)
 
@@ -26,6 +27,10 @@ struct PFTasksFeature {
 
         var highPriorityTaskCount: Int {
             tasks.filter { !$0.isCompleted && $0.priority == .high }.count
+        }
+
+        var dueSoonTaskCount: Int {
+            tasks.filter { !$0.isCompleted && $0.dueDate.isDueSoon }.count
         }
 
         var canAddTask: Bool {
@@ -60,6 +65,9 @@ struct PFTasksFeature {
                 if $0.priority != $1.priority {
                     return $0.priority.sortRank < $1.priority.sortRank
                 }
+                if $0.dueDate != $1.dueDate {
+                    return $0.dueDate.sortRank < $1.dueDate.sortRank
+                }
                 return $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
             }
         }
@@ -72,7 +80,9 @@ struct PFTasksFeature {
         case filterChanged(PFTaskFilter)
         case draftTitleChanged(String)
         case addButtonTapped
+        case dueDateChanged(PFTaskItem.ID, PFTaskDueDate)
         case priorityChanged(PFTaskItem.ID, PFTaskPriority)
+        case selectedDueDateChanged(PFTaskDueDate)
         case selectedPriorityChanged(PFTaskPriority)
         case taskCompletionToggled(PFTaskItem.ID)
         case delete(IndexSet)
@@ -126,13 +136,28 @@ struct PFTasksFeature {
                 guard !title.isEmpty else {
                     return .none
                 }
-                state.tasks.append(PFTaskItem(id: uuid(), title: title, priority: state.selectedPriority))
+                state.tasks.append(
+                    PFTaskItem(
+                        id: uuid(),
+                        title: title,
+                        priority: state.selectedPriority,
+                        dueDate: state.selectedDueDate
+                    )
+                )
                 state.draftTitle = ""
+                return save(state.tasks)
+
+            case let .dueDateChanged(id, dueDate):
+                state.tasks[id: id]?.dueDate = dueDate
                 return save(state.tasks)
 
             case let .priorityChanged(id, priority):
                 state.tasks[id: id]?.priority = priority
                 return save(state.tasks)
+
+            case let .selectedDueDateChanged(dueDate):
+                state.selectedDueDate = dueDate
+                return .none
 
             case let .selectedPriorityChanged(priority):
                 state.selectedPriority = priority
@@ -197,24 +222,60 @@ struct PFTaskItem: Equatable, Identifiable {
     var title: String
     var isCompleted: Bool
     var priority: PFTaskPriority
+    var dueDate: PFTaskDueDate
 
     init(
         id: UUID = UUID(),
         title: String,
         isCompleted: Bool = false,
-        priority: PFTaskPriority = .medium
+        priority: PFTaskPriority = .medium,
+        dueDate: PFTaskDueDate = .none
     ) {
         self.id = id
         self.title = title
         self.isCompleted = isCompleted
         self.priority = priority
+        self.dueDate = dueDate
     }
 
     static let defaults = [
         PFTaskItem(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, title: "Review architecture", isCompleted: true, priority: .high),
-        PFTaskItem(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, title: "Prepare release tag", priority: .high),
-        PFTaskItem(id: UUID(uuidString: "33333333-3333-3333-3333-333333333333")!, title: "Validate core flow", priority: .medium)
+        PFTaskItem(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, title: "Prepare release tag", priority: .high, dueDate: .today),
+        PFTaskItem(id: UUID(uuidString: "33333333-3333-3333-3333-333333333333")!, title: "Validate core flow", priority: .medium, dueDate: .thisWeek)
     ]
+}
+
+enum PFTaskDueDate: String, CaseIterable, Equatable, Identifiable {
+    case none = "No Date"
+    case today = "Today"
+    case tomorrow = "Tomorrow"
+    case thisWeek = "This Week"
+
+    var id: String {
+        rawValue
+    }
+
+    var isDueSoon: Bool {
+        switch self {
+        case .today, .tomorrow:
+            return true
+        case .none, .thisWeek:
+            return false
+        }
+    }
+
+    var sortRank: Int {
+        switch self {
+        case .today:
+            return 0
+        case .tomorrow:
+            return 1
+        case .thisWeek:
+            return 2
+        case .none:
+            return 3
+        }
+    }
 }
 
 enum PFTaskPriority: String, CaseIterable, Equatable, Identifiable {

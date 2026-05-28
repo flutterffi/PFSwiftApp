@@ -27,31 +27,43 @@ struct PFTasksView: View {
                 }
 
                 Section {
-                    HStack(spacing: 12) {
-                        TextField(
-                            "New task",
-                            text: $store.draftTitle.sending(\.draftTitleChanged)
-                        )
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 12) {
+                            TextField(
+                                "New task",
+                                text: $store.draftTitle.sending(\.draftTitleChanged)
+                            )
 
-                        Picker(
-                            "Priority",
-                            selection: $store.selectedPriority.sending(\.selectedPriorityChanged)
-                        ) {
-                            ForEach(PFTaskPriority.allCases) { priority in
-                                Text(priority.rawValue).tag(priority)
+                            Button {
+                                store.send(.addButtonTapped)
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                                    .imageScale(.large)
+                            }
+                            .disabled(!store.canAddTask)
+                            .buttonStyle(.borderless)
+                        }
+
+                        HStack(spacing: 12) {
+                            Picker(
+                                "Priority",
+                                selection: $store.selectedPriority.sending(\.selectedPriorityChanged)
+                            ) {
+                                ForEach(PFTaskPriority.allCases) { priority in
+                                    Text(priority.rawValue).tag(priority)
+                                }
+                            }
+                            .frame(maxWidth: 140)
+
+                            Picker(
+                                "Due",
+                                selection: $store.selectedDueDate.sending(\.selectedDueDateChanged)
+                            ) {
+                                ForEach(PFTaskDueDate.allCases) { dueDate in
+                                    Text(dueDate.rawValue).tag(dueDate)
+                                }
                             }
                         }
-                        .labelsHidden()
-                        .frame(maxWidth: 120)
-
-                        Button {
-                            store.send(.addButtonTapped)
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .imageScale(.large)
-                        }
-                        .disabled(!store.canAddTask)
-                        .buttonStyle(.borderless)
                     }
                 }
 
@@ -69,6 +81,11 @@ struct PFTasksView: View {
                                 Text(task.priority.rawValue)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                if task.dueDate != .none {
+                                    Text(task.dueDate.rawValue)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                                 Spacer()
 
                                 Menu {
@@ -79,6 +96,17 @@ struct PFTasksView: View {
                                     }
                                 } label: {
                                     Image(systemName: "flag")
+                                }
+                                .buttonStyle(.borderless)
+
+                                Menu {
+                                    ForEach(PFTaskDueDate.allCases) { dueDate in
+                                        Button(dueDate.rawValue) {
+                                            store.send(.dueDateChanged(task.id, dueDate))
+                                        }
+                                    }
+                                } label: {
+                                    Image(systemName: "calendar")
                                 }
                                 .buttonStyle(.borderless)
                             }

@@ -25,6 +25,7 @@ final class PFAppFeatureTests: XCTestCase {
             $0.dashboard.taskSummaryItems = [
                 PFDashboardSummary(title: "Open Tasks", value: "0"),
                 PFDashboardSummary(title: "High Priority", value: "0"),
+                PFDashboardSummary(title: "Due Soon", value: "0"),
                 PFDashboardSummary(title: "Done Tasks", value: "1"),
                 PFDashboardSummary(title: "Total Tasks", value: "1")
             ]
@@ -53,6 +54,7 @@ final class PFAppFeatureTests: XCTestCase {
             $0.dashboard.taskSummaryItems = [
                 PFDashboardSummary(title: "Open Tasks", value: "2"),
                 PFDashboardSummary(title: "High Priority", value: "1"),
+                PFDashboardSummary(title: "Due Soon", value: "1"),
                 PFDashboardSummary(title: "Done Tasks", value: "1"),
                 PFDashboardSummary(title: "Total Tasks", value: "3")
             ]
@@ -81,6 +83,7 @@ final class PFAppFeatureTests: XCTestCase {
             $0.dashboard.taskSummaryItems = [
                 PFDashboardSummary(title: "Open Tasks", value: "2"),
                 PFDashboardSummary(title: "High Priority", value: "1"),
+                PFDashboardSummary(title: "Due Soon", value: "1"),
                 PFDashboardSummary(title: "Done Tasks", value: "1"),
                 PFDashboardSummary(title: "Total Tasks", value: "3")
             ]
@@ -109,6 +112,7 @@ final class PFAppFeatureTests: XCTestCase {
             $0.dashboard.taskSummaryItems = [
                 PFDashboardSummary(title: "Open Tasks", value: "2"),
                 PFDashboardSummary(title: "High Priority", value: "1"),
+                PFDashboardSummary(title: "Due Soon", value: "1"),
                 PFDashboardSummary(title: "Done Tasks", value: "1"),
                 PFDashboardSummary(title: "Total Tasks", value: "3")
             ]

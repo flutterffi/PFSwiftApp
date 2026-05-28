@@ -84,6 +84,7 @@ struct PFAppFeature {
             taskSummaryItems: [
                 PFDashboardSummary(title: "Open Tasks", value: "\(tasks.activeTaskCount)"),
                 PFDashboardSummary(title: "High Priority", value: "\(tasks.highPriorityTaskCount)"),
+                PFDashboardSummary(title: "Due Soon", value: "\(tasks.dueSoonTaskCount)"),
                 PFDashboardSummary(title: "Done Tasks", value: "\(tasks.completedTaskCount)"),
                 PFDashboardSummary(title: "Total Tasks", value: "\(tasks.tasks.count)")
             ],
