@@ -10,6 +10,7 @@ struct PFSettingsFeature {
         var isLoading = false
         var isAnalyticsEnabled = true
         var isCrashReportingEnabled = true
+        var themeMode: PFThemeMode = .system
     }
 
     enum Action: Equatable {
@@ -20,6 +21,7 @@ struct PFSettingsFeature {
         case saveSucceeded
         case settingsErrorDismissed
         case task
+        case themeModeChanged(PFThemeMode)
     }
 
     var body: some ReducerOf<Self> {
@@ -38,6 +40,7 @@ struct PFSettingsFeature {
                 state.isAnalyticsEnabled = preferences.isAnalyticsEnabled
                 state.isCrashReportingEnabled = preferences.isCrashReportingEnabled
                 state.isLoading = false
+                state.themeMode = preferences.themeMode
                 return .none
 
             case let .loadResponse(.failure(error)):
@@ -69,6 +72,10 @@ struct PFSettingsFeature {
                         )
                     )
                 }
+
+            case let .themeModeChanged(themeMode):
+                state.themeMode = themeMode
+                return save(state)
             }
         }
     }
@@ -76,7 +83,8 @@ struct PFSettingsFeature {
     private func save(_ state: State) -> Effect<Action> {
         let preferences = PFSettingsPreferences(
             isAnalyticsEnabled: state.isAnalyticsEnabled,
-            isCrashReportingEnabled: state.isCrashReportingEnabled
+            isCrashReportingEnabled: state.isCrashReportingEnabled,
+            themeMode: state.themeMode
         )
         return .run { send in
             do {
@@ -92,4 +100,15 @@ struct PFSettingsFeature {
 struct PFSettingsPreferences: Equatable, Sendable {
     var isAnalyticsEnabled: Bool
     var isCrashReportingEnabled: Bool
+    var themeMode: PFThemeMode = .system
+}
+
+enum PFThemeMode: String, CaseIterable, Equatable, Identifiable, Sendable {
+    case system = "System"
+    case light = "Light"
+    case dark = "Dark"
+
+    var id: String {
+        rawValue
+    }
 }

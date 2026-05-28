@@ -38,5 +38,19 @@ struct PFAppView: View {
             }
             .tag(PFTab.settings)
         }
+        .preferredColorScheme(store.settings.themeMode.colorScheme)
+    }
+}
+
+private extension PFThemeMode {
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
     }
 }

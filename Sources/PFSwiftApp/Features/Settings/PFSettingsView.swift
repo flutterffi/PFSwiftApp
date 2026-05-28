@@ -7,6 +7,17 @@ struct PFSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Appearance") {
+                    Picker(
+                        "Theme",
+                        selection: $store.themeMode.sending(\.themeModeChanged)
+                    ) {
+                        ForEach(PFThemeMode.allCases) { themeMode in
+                            Text(themeMode.rawValue).tag(themeMode)
+                        }
+                    }
+                }
+
                 Section("Telemetry") {
                     Toggle(
                         "Analytics",

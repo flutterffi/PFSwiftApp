@@ -7,7 +7,8 @@ final class PFSettingsFeatureTests: XCTestCase {
     func testLoadPreferences() async {
         let preferences = PFSettingsPreferences(
             isAnalyticsEnabled: false,
-            isCrashReportingEnabled: true
+            isCrashReportingEnabled: true,
+            themeMode: .dark
         )
         let store = TestStore(initialState: PFSettingsFeature.State()) {
             PFSettingsFeature()
@@ -22,6 +23,7 @@ final class PFSettingsFeatureTests: XCTestCase {
             $0.isAnalyticsEnabled = false
             $0.isCrashReportingEnabled = true
             $0.isLoading = false
+            $0.themeMode = .dark
         }
     }
 
@@ -45,7 +47,34 @@ final class PFSettingsFeatureTests: XCTestCase {
             preferences,
             PFSettingsPreferences(
                 isAnalyticsEnabled: false,
-                isCrashReportingEnabled: true
+                isCrashReportingEnabled: true,
+                themeMode: .system
+            )
+        )
+    }
+
+    func testThemeModeChangeSavesPreferences() async {
+        let recorder = PFSettingsSaveRecorder()
+        let store = TestStore(initialState: PFSettingsFeature.State()) {
+            PFSettingsFeature()
+        } withDependencies: {
+            $0.settingsClient.savePreferences = { preferences in
+                await recorder.save(preferences)
+            }
+        }
+
+        await store.send(.themeModeChanged(.dark)) {
+            $0.themeMode = .dark
+        }
+        await store.receive(.saveSucceeded)
+
+        let preferences = await recorder.savedPreferences()
+        XCTAssertEqual(
+            preferences,
+            PFSettingsPreferences(
+                isAnalyticsEnabled: true,
+                isCrashReportingEnabled: true,
+                themeMode: .dark
             )
         )
     }

@@ -35,7 +35,8 @@ extension PFSettingsClient: DependencyKey {
             reportIssue("PFSettingsClient.fetchPreferences is unimplemented")
             return PFSettingsPreferences(
                 isAnalyticsEnabled: true,
-                isCrashReportingEnabled: true
+                isCrashReportingEnabled: true,
+                themeMode: .system
             )
         },
         savePreferences: { _ in
@@ -54,7 +55,8 @@ extension DependencyValues {
 private actor PFSettingsStorage {
     private var preferences = PFSettingsPreferences(
         isAnalyticsEnabled: true,
-        isCrashReportingEnabled: true
+        isCrashReportingEnabled: true,
+        themeMode: .system
     )
 
     func fetchPreferences() -> PFSettingsPreferences {

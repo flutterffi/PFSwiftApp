@@ -15,6 +15,7 @@ struct PFDashboardFeature {
             PFDashboardSummary(title: "Total Messages", value: "2")
         ]
         var systemSummaryItems: [PFDashboardSummary] = [
+            PFDashboardSummary(title: "Theme", value: "System"),
             PFDashboardSummary(title: "Analytics", value: "On"),
             PFDashboardSummary(title: "Crash Reporting", value: "On")
         ]

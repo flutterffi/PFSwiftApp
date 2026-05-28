@@ -91,6 +91,7 @@ struct PFAppFeature {
                 PFDashboardSummary(title: "Total Messages", value: "\(messages.threads.count)")
             ],
             systemSummaryItems: [
+                PFDashboardSummary(title: "Theme", value: settings.themeMode.rawValue),
                 PFDashboardSummary(title: "Analytics", value: settings.isAnalyticsEnabled ? "On" : "Off"),
                 PFDashboardSummary(title: "Crash Reporting", value: settings.isCrashReportingEnabled ? "On" : "Off")
             ]
