@@ -5,7 +5,7 @@ xcassets:
   inputs:
     - Assets.xcassets
   outputs:
-    - templateName: swift5
+    - templatePath: SwiftGenTemplates/PFAssetsSwift6.stencil
       params:
         enumName: PFAsset
       output: PFAsset.swift
@@ -24,7 +24,7 @@ json:
     - Mock/PFDashboardSummary.json
     - Mock/PFTabItems.json
   outputs:
-    - templateName: runtime-swift5
+    - templatePath: SwiftGenTemplates/PFJSONSwift6.stencil
       params:
         enumName: PFJSON
       output: PFJSON.swift

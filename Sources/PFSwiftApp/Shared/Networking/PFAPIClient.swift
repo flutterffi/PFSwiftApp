@@ -3,16 +3,14 @@ import Foundation
 
 struct PFAPIClient: Sendable {
     var sendData: @Sendable (PFAPIEndpoint) async throws -> Data
-    var send: @Sendable (PFAPIEndpoint, any Decodable.Type) async throws -> Any
+    var responseDecoder: PFAPIResponseDecoder = PFAPIResponseDecoder()
 
     func send<Response: Decodable & Sendable>(
         _ endpoint: PFAPIEndpoint,
         as responseType: Response.Type = Response.self
     ) async throws -> Response {
-        guard let response = try await send(endpoint, responseType) as? Response else {
-            throw PFAPIError.decoding("Decoded response type mismatch.")
-        }
-        return response
+        let data = try await sendData(endpoint)
+        return try responseDecoder.decode(responseType, from: data)
     }
 }
 
@@ -43,10 +41,7 @@ extension PFAPIClient {
         }
         return PFAPIClient(
             sendData: sendData,
-            send: { endpoint, responseType in
-                let data = try await sendData(endpoint)
-                return try decoder.decode(responseType, from: data)
-            }
+            responseDecoder: decoder
         )
     }
 }
@@ -57,10 +52,6 @@ extension PFAPIClient: DependencyKey {
     static let testValue = PFAPIClient(
         sendData: { _ in
             reportIssue("PFAPIClient.sendData is unimplemented")
-            return Data()
-        },
-        send: { _, _ in
-            reportIssue("PFAPIClient.send is unimplemented")
             return Data()
         }
     )

@@ -1,0 +1,36 @@
+// swiftlint:disable all
+// Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
+
+{% if files %}
+{% set accessModifier %}{% if param.publicAccess %}public{% else %}internal{% endif %}{% endset %}
+import Foundation
+
+{% macro transformPath path %}
+  {%- if param.preservePath -%}
+    {{path}}
+  {%- else -%}
+    {{path|basename}}
+  {%- endif -%}
+{% endmacro %}
+
+{{accessModifier}} enum {{param.enumName|default:"PFJSON"}} {
+  {% for file in files %}
+  {{accessModifier}} enum {{file.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+    {{accessModifier}} static let path = "{% call transformPath file.path %}"
+
+    {{accessModifier}} static func data() throws -> Data {
+      guard let url = Bundle.module.url(forResource: path, withExtension: nil) else {
+        throw PFJSONResourceError.missingResource(path)
+      }
+      return try Data(contentsOf: url)
+    }
+  }
+  {% endfor %}
+}
+
+{{accessModifier}} enum PFJSONResourceError: Error, Equatable, Sendable {
+  case missingResource(String)
+}
+{% else %}
+// No files found
+{% endif %}

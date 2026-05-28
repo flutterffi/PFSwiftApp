@@ -26,6 +26,14 @@ PFJSON.swift
 
 SwiftPM runs `SwiftGenPlugin` during build and writes generated files into derived sources.
 
+Custom templates live under:
+
+```text
+SwiftGenTemplates
+```
+
+The custom asset and JSON templates are intentionally Swift 6 concurrency-safe.
+
 ## Resource Categories
 
 Use these categories before adding new resource types:

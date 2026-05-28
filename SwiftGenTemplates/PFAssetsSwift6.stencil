@@ -1,0 +1,43 @@
+// swiftlint:disable all
+// Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
+
+{% if catalogs %}
+{% set accessModifier %}{% if param.publicAccess %}public{% else %}internal{% endif %}{% endset %}
+import SwiftUI
+
+{% macro casesBlock assets %}
+  {% for asset in assets %}
+  {% if asset.type == "color" %}
+  {{accessModifier}} static let {{asset.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = PFColorAsset(name: "{{asset.value}}")
+  {% elif asset.type == "image" %}
+  {{accessModifier}} static let {{asset.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = PFImageAsset(name: "{{asset.value}}")
+  {% elif asset.items %}
+  {% call casesBlock asset.items %}
+  {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{{accessModifier}} enum {{param.enumName|default:"PFAsset"}} {
+  {% for catalog in catalogs %}
+  {% call casesBlock catalog.assets %}
+  {% endfor %}
+}
+
+{{accessModifier}} struct PFColorAsset: Sendable {
+  {{accessModifier}} let name: String
+
+  {{accessModifier}} var swiftUIColor: SwiftUI.Color {
+    SwiftUI.Color(name, bundle: Bundle.module)
+  }
+}
+
+{{accessModifier}} struct PFImageAsset: Sendable {
+  {{accessModifier}} let name: String
+
+  {{accessModifier}} var swiftUIImage: SwiftUI.Image {
+    SwiftUI.Image(name, bundle: Bundle.module)
+  }
+}
+{% else %}
+// No assets found
+{% endif %}

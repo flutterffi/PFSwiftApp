@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.3
 
 import PackageDescription
 
@@ -6,8 +6,8 @@ let package = Package(
     name: "PFSwiftApp",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v14)
+        .iOS("26.0"),
+        .macOS("26.0")
     ],
     products: [
         .executable(name: "PFSwiftApp", targets: ["PFSwiftApp"])

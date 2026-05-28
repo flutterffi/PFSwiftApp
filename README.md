@@ -15,3 +15,7 @@ All app-level types use the `PF` prefix.
 ## Resources
 
 Resource workflow, SwiftGen usage, naming rules, and replacement order are documented in [PFResourceManagement.md](Docs/PFResourceManagement.md).
+
+## Platform Policy
+
+This project follows a latest-platform-first policy. Deployment targets and dependency rules are documented in [PFPlatformPolicy.md](Docs/PFPlatformPolicy.md).
