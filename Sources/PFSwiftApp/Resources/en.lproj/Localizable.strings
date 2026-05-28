@@ -3,3 +3,7 @@
 "tasks.empty.title" = "No tasks in this view.";
 "messages.empty.title" = "No messages in this view.";
 "settings.notifications.alerts" = "Alerts";
+"tab.dashboard" = "Dashboard";
+"tab.tasks" = "Tasks";
+"tab.messages" = "Messages";
+"tab.settings" = "Settings";

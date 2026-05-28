@@ -113,6 +113,22 @@ PFTabSettings
 
 When replacing them, keep the asset names stable so existing generated APIs do not change.
 
+Tab titles are localized through:
+
+```text
+tab.dashboard
+tab.tasks
+tab.messages
+tab.settings
+```
+
+Tab UI must use both generated accessors:
+
+```swift
+PFAsset.pfTabDashboard.swiftUIImage
+Text(PFStrings.Tab.dashboard)
+```
+
 ## Empty State Images
 
 Use `PFEmptyState` for generic empty views until feature-specific artwork is introduced.

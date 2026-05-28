@@ -10,7 +10,9 @@ struct PFAppView: View {
                 store: store.scope(state: \.dashboard, action: \.dashboard)
             )
             .tabItem {
-                Label("Dashboard", systemImage: "chart.bar.xaxis")
+                PFAsset.pfTabDashboard.swiftUIImage
+                    .renderingMode(.template)
+                Text(PFStrings.Tab.dashboard)
             }
             .tag(PFTab.dashboard)
 
@@ -18,7 +20,9 @@ struct PFAppView: View {
                 store: store.scope(state: \.tasks, action: \.tasks)
             )
             .tabItem {
-                Label("Tasks", systemImage: "checklist")
+                PFAsset.pfTabTasks.swiftUIImage
+                    .renderingMode(.template)
+                Text(PFStrings.Tab.tasks)
             }
             .tag(PFTab.tasks)
 
@@ -26,7 +30,9 @@ struct PFAppView: View {
                 store: store.scope(state: \.messages, action: \.messages)
             )
             .tabItem {
-                Label("Messages", systemImage: "bubble.left.and.bubble.right")
+                PFAsset.pfTabMessages.swiftUIImage
+                    .renderingMode(.template)
+                Text(PFStrings.Tab.messages)
             }
             .tag(PFTab.messages)
 
@@ -34,7 +40,9 @@ struct PFAppView: View {
                 store: store.scope(state: \.settings, action: \.settings)
             )
             .tabItem {
-                Label("Settings", systemImage: "gearshape")
+                PFAsset.pfTabSettings.swiftUIImage
+                    .renderingMode(.template)
+                Text(PFStrings.Tab.settings)
             }
             .tag(PFTab.settings)
         }
