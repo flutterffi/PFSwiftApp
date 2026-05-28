@@ -6,6 +6,7 @@ struct PFTasksFeature: Reducer {
 
     struct State: Equatable {
         var draftTitle = ""
+        var searchText = ""
         var selectedFilter: PFTaskFilter = .all
         var tasks: IdentifiedArrayOf<PFTaskItem> = [
             PFTaskItem(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, title: "Review architecture", isCompleted: true),
@@ -26,18 +27,31 @@ struct PFTasksFeature: Reducer {
         }
 
         var visibleTasks: IdentifiedArrayOf<PFTaskItem> {
+            let filteredTasks: [PFTaskItem]
             switch selectedFilter {
             case .all:
-                return tasks
+                filteredTasks = Array(tasks)
             case .active:
-                return IdentifiedArray(uniqueElements: tasks.filter { !$0.isCompleted })
+                filteredTasks = tasks.filter { !$0.isCompleted }
             case .done:
-                return IdentifiedArray(uniqueElements: tasks.filter(\.isCompleted))
+                filteredTasks = tasks.filter(\.isCompleted)
             }
+
+            let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !query.isEmpty else {
+                return IdentifiedArray(uniqueElements: filteredTasks)
+            }
+
+            return IdentifiedArray(
+                uniqueElements: filteredTasks.filter {
+                    $0.title.localizedCaseInsensitiveContains(query)
+                }
+            )
         }
     }
 
     enum Action: Equatable {
+        case searchTextChanged(String)
         case filterChanged(PFTaskFilter)
         case draftTitleChanged(String)
         case addButtonTapped
@@ -49,6 +63,10 @@ struct PFTasksFeature: Reducer {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case let .searchTextChanged(searchText):
+                state.searchText = searchText
+                return .none
+
             case let .filterChanged(filter):
                 state.selectedFilter = filter
                 return .none

@@ -65,4 +65,53 @@ final class PFTasksFeatureTests: XCTestCase {
             ]
         }
     }
+
+    func testSearchFiltersVisibleTasks() async {
+        let firstID = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+        let secondID = UUID(uuidString: "99999999-9999-9999-9999-999999999999")!
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                tasks: [
+                    PFTaskItem(id: firstID, title: "Prepare release"),
+                    PFTaskItem(id: secondID, title: "Validate core flow")
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        }
+
+        await store.send(.searchTextChanged("release")) {
+            $0.searchText = "release"
+        }
+        XCTAssertEqual(
+            store.state.visibleTasks,
+            [
+                PFTaskItem(id: firstID, title: "Prepare release")
+            ]
+        )
+    }
+
+    func testSearchCombinesWithStatusFilter() async {
+        let activeID = UUID(uuidString: "12345678-1234-1234-1234-123456789012")!
+        let doneID = UUID(uuidString: "23456789-2345-2345-2345-234567890123")!
+        let store = TestStore(
+            initialState: PFTasksFeature.State(
+                searchText: "release",
+                selectedFilter: .active,
+                tasks: [
+                    PFTaskItem(id: activeID, title: "Prepare release"),
+                    PFTaskItem(id: doneID, title: "Release checklist", isCompleted: true)
+                ]
+            )
+        ) {
+            PFTasksFeature()
+        }
+
+        XCTAssertEqual(
+            store.state.visibleTasks,
+            [
+                PFTaskItem(id: activeID, title: "Prepare release")
+            ]
+        )
+    }
 }

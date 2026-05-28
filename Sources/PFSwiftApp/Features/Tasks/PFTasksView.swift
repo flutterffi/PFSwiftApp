@@ -9,6 +9,16 @@ struct PFTasksView: View {
             NavigationStack {
                 List {
                     Section {
+                        TextField(
+                            "Search tasks",
+                            text: viewStore.binding(
+                                get: \.searchText,
+                                send: PFTasksFeature.Action.searchTextChanged
+                            )
+                        )
+                    }
+
+                    Section {
                         Picker(
                             "Filter",
                             selection: viewStore.binding(
