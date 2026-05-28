@@ -36,6 +36,7 @@ extension PFSettingsClient: DependencyKey {
             return PFSettingsPreferences(
                 isAnalyticsEnabled: true,
                 isCrashReportingEnabled: true,
+                isNotificationAlertsEnabled: true,
                 themeMode: .system
             )
         },
@@ -56,6 +57,7 @@ private actor PFSettingsStorage {
     private var preferences = PFSettingsPreferences(
         isAnalyticsEnabled: true,
         isCrashReportingEnabled: true,
+        isNotificationAlertsEnabled: true,
         themeMode: .system
     )
 

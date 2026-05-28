@@ -8,6 +8,7 @@ final class PFSettingsFeatureTests: XCTestCase {
         let preferences = PFSettingsPreferences(
             isAnalyticsEnabled: false,
             isCrashReportingEnabled: true,
+            isNotificationAlertsEnabled: false,
             themeMode: .dark
         )
         let store = TestStore(initialState: PFSettingsFeature.State()) {
@@ -23,6 +24,7 @@ final class PFSettingsFeatureTests: XCTestCase {
             $0.isAnalyticsEnabled = false
             $0.isCrashReportingEnabled = true
             $0.isLoading = false
+            $0.isNotificationAlertsEnabled = false
             $0.themeMode = .dark
         }
     }
@@ -48,6 +50,34 @@ final class PFSettingsFeatureTests: XCTestCase {
             PFSettingsPreferences(
                 isAnalyticsEnabled: false,
                 isCrashReportingEnabled: true,
+                isNotificationAlertsEnabled: true,
+                themeMode: .system
+            )
+        )
+    }
+
+    func testNotificationAlertsChangeSavesPreferences() async {
+        let recorder = PFSettingsSaveRecorder()
+        let store = TestStore(initialState: PFSettingsFeature.State()) {
+            PFSettingsFeature()
+        } withDependencies: {
+            $0.settingsClient.savePreferences = { preferences in
+                await recorder.save(preferences)
+            }
+        }
+
+        await store.send(.notificationAlertsChanged(false)) {
+            $0.isNotificationAlertsEnabled = false
+        }
+        await store.receive(.saveSucceeded)
+
+        let preferences = await recorder.savedPreferences()
+        XCTAssertEqual(
+            preferences,
+            PFSettingsPreferences(
+                isAnalyticsEnabled: true,
+                isCrashReportingEnabled: true,
+                isNotificationAlertsEnabled: false,
                 themeMode: .system
             )
         )
@@ -74,6 +104,7 @@ final class PFSettingsFeatureTests: XCTestCase {
             PFSettingsPreferences(
                 isAnalyticsEnabled: true,
                 isCrashReportingEnabled: true,
+                isNotificationAlertsEnabled: true,
                 themeMode: .dark
             )
         )

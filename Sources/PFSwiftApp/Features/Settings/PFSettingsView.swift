@@ -28,6 +28,13 @@ struct PFSettingsView: View {
                         isOn: $store.isCrashReportingEnabled.sending(\.crashReportingChanged)
                     )
                 }
+
+                Section("Notifications") {
+                    Toggle(
+                        "Alerts",
+                        isOn: $store.isNotificationAlertsEnabled.sending(\.notificationAlertsChanged)
+                    )
+                }
             }
             .navigationTitle("Settings")
             .overlay {

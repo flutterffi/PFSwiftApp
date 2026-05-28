@@ -36,6 +36,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.systemSummaryItems = [
                 PFDashboardSummary(title: "Theme", value: "System"),
+                PFDashboardSummary(title: "Alerts", value: "On"),
                 PFDashboardSummary(title: "Analytics", value: "On"),
                 PFDashboardSummary(title: "Crash Reporting", value: "On")
             ]
@@ -66,6 +67,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.systemSummaryItems = [
                 PFDashboardSummary(title: "Theme", value: "System"),
+                PFDashboardSummary(title: "Alerts", value: "On"),
                 PFDashboardSummary(title: "Analytics", value: "Off"),
                 PFDashboardSummary(title: "Crash Reporting", value: "On")
             ]
@@ -96,6 +98,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.systemSummaryItems = [
                 PFDashboardSummary(title: "Theme", value: "System"),
+                PFDashboardSummary(title: "Alerts", value: "On"),
                 PFDashboardSummary(title: "Analytics", value: "On"),
                 PFDashboardSummary(title: "Crash Reporting", value: "On")
             ]
@@ -126,6 +129,7 @@ final class PFAppFeatureTests: XCTestCase {
             ]
             $0.dashboard.systemSummaryItems = [
                 PFDashboardSummary(title: "Theme", value: "Dark"),
+                PFDashboardSummary(title: "Alerts", value: "On"),
                 PFDashboardSummary(title: "Analytics", value: "On"),
                 PFDashboardSummary(title: "Crash Reporting", value: "On")
             ]

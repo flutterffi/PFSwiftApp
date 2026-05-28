@@ -95,6 +95,7 @@ struct PFAppFeature {
             ],
             systemSummaryItems: [
                 PFDashboardSummary(title: "Theme", value: settings.themeMode.rawValue),
+                PFDashboardSummary(title: "Alerts", value: settings.isNotificationAlertsEnabled ? "On" : "Off"),
                 PFDashboardSummary(title: "Analytics", value: settings.isAnalyticsEnabled ? "On" : "Off"),
                 PFDashboardSummary(title: "Crash Reporting", value: settings.isCrashReportingEnabled ? "On" : "Off")
             ]

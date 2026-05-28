@@ -10,6 +10,7 @@ struct PFSettingsFeature {
         var isLoading = false
         var isAnalyticsEnabled = true
         var isCrashReportingEnabled = true
+        var isNotificationAlertsEnabled = true
         var themeMode: PFThemeMode = .system
     }
 
@@ -17,6 +18,7 @@ struct PFSettingsFeature {
         case analyticsChanged(Bool)
         case crashReportingChanged(Bool)
         case loadResponse(Result<PFSettingsPreferences, PFSettingsClientError>)
+        case notificationAlertsChanged(Bool)
         case saveFailed(PFSettingsClientError)
         case saveSucceeded
         case settingsErrorDismissed
@@ -40,6 +42,7 @@ struct PFSettingsFeature {
                 state.isAnalyticsEnabled = preferences.isAnalyticsEnabled
                 state.isCrashReportingEnabled = preferences.isCrashReportingEnabled
                 state.isLoading = false
+                state.isNotificationAlertsEnabled = preferences.isNotificationAlertsEnabled
                 state.themeMode = preferences.themeMode
                 return .none
 
@@ -47,6 +50,10 @@ struct PFSettingsFeature {
                 state.errorMessage = error.message
                 state.isLoading = false
                 return .none
+
+            case let .notificationAlertsChanged(isEnabled):
+                state.isNotificationAlertsEnabled = isEnabled
+                return save(state)
 
             case let .saveFailed(error):
                 state.errorMessage = error.message
@@ -84,6 +91,7 @@ struct PFSettingsFeature {
         let preferences = PFSettingsPreferences(
             isAnalyticsEnabled: state.isAnalyticsEnabled,
             isCrashReportingEnabled: state.isCrashReportingEnabled,
+            isNotificationAlertsEnabled: state.isNotificationAlertsEnabled,
             themeMode: state.themeMode
         )
         return .run { send in
@@ -100,6 +108,7 @@ struct PFSettingsFeature {
 struct PFSettingsPreferences: Equatable, Sendable {
     var isAnalyticsEnabled: Bool
     var isCrashReportingEnabled: Bool
+    var isNotificationAlertsEnabled: Bool = true
     var themeMode: PFThemeMode = .system
 }
 
