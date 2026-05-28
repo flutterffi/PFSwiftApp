@@ -63,7 +63,7 @@ struct PFMessagesView: View {
                     Text("\(store.unreadThreadCount) Unread")
                 } footer: {
                     if store.visibleThreads.isEmpty {
-                        Text("No messages in this view.")
+                        Text(PFStrings.Messages.Empty.title)
                     } else {
                         Text("\(store.pinnedThreadCount) Pinned")
                     }

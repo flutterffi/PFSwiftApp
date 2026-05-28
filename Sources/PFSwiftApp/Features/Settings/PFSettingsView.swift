@@ -31,7 +31,7 @@ struct PFSettingsView: View {
 
                 Section("Notifications") {
                     Toggle(
-                        "Alerts",
+                        PFStrings.Settings.Notifications.alerts,
                         isOn: $store.isNotificationAlertsEnabled.sending(\.notificationAlertsChanged)
                     )
                 }

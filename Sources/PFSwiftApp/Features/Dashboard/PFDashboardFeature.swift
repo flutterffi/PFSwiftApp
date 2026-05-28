@@ -4,7 +4,7 @@ import ComposableArchitecture
 struct PFDashboardFeature {
     @ObservableState
     struct State: Equatable {
-        var title = "Operations"
+        var title = PFStrings.Dashboard.title
         var taskSummaryItems: [PFDashboardSummary] = [
             PFDashboardSummary(title: "Open Tasks", value: "2"),
             PFDashboardSummary(title: "High Priority", value: "1"),

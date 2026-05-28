@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "PFSwiftApp",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v16),
         .macOS(.v14)
@@ -12,6 +13,7 @@ let package = Package(
         .executable(name: "PFSwiftApp", targets: ["PFSwiftApp"])
     ],
     dependencies: [
+        .package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.2"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", exact: "1.25.5")
     ],
     targets: [
@@ -19,6 +21,12 @@ let package = Package(
             name: "PFSwiftApp",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            resources: [
+                .process("Resources")
+            ],
+            plugins: [
+                .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
             ]
         ),
         .testTarget(

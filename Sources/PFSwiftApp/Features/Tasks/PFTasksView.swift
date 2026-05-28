@@ -132,7 +132,7 @@ struct PFTasksView: View {
                     Text("\(store.activeTaskCount) Active")
                 } footer: {
                     if store.visibleTasks.isEmpty {
-                        Text("No tasks in this view.")
+                        Text(PFStrings.Tasks.Empty.title)
                     }
                 }
             }
