@@ -119,6 +119,52 @@ final class PFMessagesFeatureTests: XCTestCase {
         )
     }
 
+    func testSearchFiltersVisibleThreadsByTitle() async {
+        let store = TestStore(
+            initialState: PFMessagesFeature.State(
+                threads: [
+                    PFMessageThread(title: "Support", preview: "Ticket updated."),
+                    PFMessageThread(title: "Release", preview: "Tag preparation is queued.")
+                ]
+            )
+        ) {
+            PFMessagesFeature()
+        }
+
+        await store.send(.searchTextChanged("release")) {
+            $0.searchText = "release"
+        }
+        XCTAssertEqual(
+            store.state.visibleThreads,
+            [
+                PFMessageThread(title: "Release", preview: "Tag preparation is queued.")
+            ]
+        )
+    }
+
+    func testSearchFiltersVisibleThreadsByPreview() async {
+        let store = TestStore(
+            initialState: PFMessagesFeature.State(
+                threads: [
+                    PFMessageThread(title: "Support", preview: "Ticket updated."),
+                    PFMessageThread(title: "Release", preview: "Tag preparation is queued.")
+                ]
+            )
+        ) {
+            PFMessagesFeature()
+        }
+
+        await store.send(.searchTextChanged("ticket")) {
+            $0.searchText = "ticket"
+        }
+        XCTAssertEqual(
+            store.state.visibleThreads,
+            [
+                PFMessageThread(title: "Support", preview: "Ticket updated.")
+            ]
+        )
+    }
+
     func testSaveFailureShowsError() async {
         struct SaveFailure: Error {}
 

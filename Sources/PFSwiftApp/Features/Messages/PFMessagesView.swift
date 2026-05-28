@@ -2,11 +2,18 @@ import ComposableArchitecture
 import SwiftUI
 
 struct PFMessagesView: View {
-    let store: StoreOf<PFMessagesFeature>
+    @Bindable var store: StoreOf<PFMessagesFeature>
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    TextField(
+                        "Search messages",
+                        text: $store.searchText.sending(\.searchTextChanged)
+                    )
+                }
+
                 Section {
                     ForEach(store.visibleThreads) { thread in
                         Button {
@@ -55,7 +62,11 @@ struct PFMessagesView: View {
                 } header: {
                     Text("\(store.unreadThreadCount) Unread")
                 } footer: {
-                    Text("\(store.pinnedThreadCount) Pinned")
+                    if store.visibleThreads.isEmpty {
+                        Text("No messages in this view.")
+                    } else {
+                        Text("\(store.pinnedThreadCount) Pinned")
+                    }
                 }
             }
             .navigationTitle("Messages")

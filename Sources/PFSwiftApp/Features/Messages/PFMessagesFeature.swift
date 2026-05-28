@@ -8,6 +8,7 @@ struct PFMessagesFeature {
     struct State: Equatable {
         var errorMessage: String?
         var isLoading = false
+        var searchText = ""
         var selectedThreadID: PFMessageThread.ID?
         var threads: IdentifiedArrayOf<PFMessageThread> = IdentifiedArray(uniqueElements: PFMessageThread.defaults)
 
@@ -20,8 +21,19 @@ struct PFMessagesFeature {
         }
 
         var visibleThreads: IdentifiedArrayOf<PFMessageThread> {
-            IdentifiedArray(
-                uniqueElements: threads.sorted {
+            let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let filteredThreads: [PFMessageThread]
+            if query.isEmpty {
+                filteredThreads = Array(threads)
+            } else {
+                filteredThreads = threads.filter {
+                    $0.title.localizedCaseInsensitiveContains(query)
+                        || $0.preview.localizedCaseInsensitiveContains(query)
+                }
+            }
+
+            return IdentifiedArray(
+                uniqueElements: filteredThreads.sorted {
                     if $0.isPinned != $1.isPinned {
                         return $0.isPinned && !$1.isPinned
                     }
@@ -41,6 +53,7 @@ struct PFMessagesFeature {
         case pinToggled(PFMessageThread.ID)
         case saveFailed(PFMessageClientError)
         case saveSucceeded
+        case searchTextChanged(String)
         case task
         case threadTapped(PFMessageThread.ID)
         case unreadToggled(PFMessageThread.ID)
@@ -79,6 +92,10 @@ struct PFMessagesFeature {
                 return .none
 
             case .saveSucceeded:
+                return .none
+
+            case let .searchTextChanged(searchText):
+                state.searchText = searchText
                 return .none
 
             case .task:
