@@ -2,6 +2,7 @@ import Foundation
 
 enum PFAPIError: Error, Equatable, Sendable {
     case decoding(String)
+    case encoding(String)
     case invalidResponse
     case invalidURL
     case statusCode(Int, Data)
@@ -10,6 +11,8 @@ enum PFAPIError: Error, Equatable, Sendable {
     var message: String {
         switch self {
         case let .decoding(message):
+            return message
+        case let .encoding(message):
             return message
         case .invalidResponse:
             return "Invalid response."

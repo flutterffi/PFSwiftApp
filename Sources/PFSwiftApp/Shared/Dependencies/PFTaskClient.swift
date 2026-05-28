@@ -86,7 +86,7 @@ private enum PFTaskEndpoint {
     static let list = PFAPIEndpoint(path: "tasks")
 
     static func save(_ tasks: [PFTaskRequest]) throws -> PFAPIEndpoint {
-        let body = try JSONEncoder().encode(tasks)
+        let body = try PFAPIJSONCoding.encode(tasks)
         return PFAPIEndpoint(
             path: "tasks",
             method: .put,

@@ -18,7 +18,7 @@ Use these commands before introducing platform or dependency changes:
 
 ```text
 swift test
-rg -n "NavigationView|presentationMode|UIApplication|UIScreen|Image\\(\"|Color\\(\"|@available|deprecated|exact:" Sources Tests Package.swift swiftgen.yml Docs README.md SwiftGenTemplates
+rg -n "NavigationView|presentationMode|UIApplication|UIScreen|Image\\(\"|Color\\(\"|@available|deprecated|exact:|JSONEncoder\\(\\)|JSONDecoder\\(\\)" Sources Tests Package.swift swiftgen.yml Docs README.md SwiftGenTemplates
 ```
 
 ## Current Result
@@ -41,6 +41,9 @@ Color("...")
 
 No exact package pins remain in `Package.swift`.
 
+JSON request and response coding is centralized in `PFAPIJSONCoding`. App features and dependency
+clients should not create their own `JSONEncoder` or `JSONDecoder` instances.
+
 ## Accepted Findings
 
 The documentation intentionally contains examples of disallowed raw resource access:
@@ -55,10 +58,14 @@ These examples are kept in `PFResourceManagement.md` to show what reviewers shou
 
 Tests may use Foundation primitives such as `URL(string:)` and `JSONSerialization` where they are verifying networking behavior or request payload shape.
 
+`PFAPIJSONCoding` is the only accepted production location for direct `JSONEncoder()` and
+`JSONDecoder()` construction.
+
 ## Review Rules
 
 1. Prefer `NavigationStack` over `NavigationView`.
 2. Prefer generated `PFAsset` and `PFStrings` accessors over raw resource strings.
 3. Prefer latest-compatible package ranges over exact pins.
 4. Do not add old-platform availability fallbacks.
-5. Treat compiler deprecation warnings as failures unless a short migration note is added here.
+5. Keep JSON coding policy inside `PFAPIJSONCoding`.
+6. Treat compiler deprecation warnings as failures unless a short migration note is added here.

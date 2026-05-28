@@ -79,6 +79,24 @@ final class PFAPIClientTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
     }
+
+    func testJSONCodingMapsDecodingErrors() {
+        XCTAssertThrowsError(
+            try PFAPIJSONCoding.decode(PFStubResponse.self, from: Data(#"{"id":1}"#.utf8))
+        ) { error in
+            XCTAssertTrue(error is PFAPIError)
+            XCTAssertTrue((error as? PFAPIError)?.message.isEmpty == false)
+        }
+    }
+
+    func testJSONCodingMapsEncodingErrors() {
+        XCTAssertThrowsError(
+            try PFAPIJSONCoding.encode(PFInvalidEncodable())
+        ) { error in
+            XCTAssertTrue(error is PFAPIError)
+            XCTAssertTrue((error as? PFAPIError)?.message.isEmpty == false)
+        }
+    }
 }
 
 private enum PFStubResponseEndpoint {
@@ -89,6 +107,14 @@ private struct PFStubResponse: Decodable, Equatable, Sendable {
     var id: String
     var title: String
 }
+
+private struct PFInvalidEncodable: Encodable, Sendable {
+    func encode(to encoder: Encoder) throws {
+        throw PFInvalidEncodingError()
+    }
+}
+
+private struct PFInvalidEncodingError: Error {}
 
 private final class PFURLProtocolStub: URLProtocol {
     nonisolated(unsafe) static var lastRequest: URLRequest?
