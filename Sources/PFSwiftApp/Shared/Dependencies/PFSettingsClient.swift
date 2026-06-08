@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 
 struct PFSettingsClient: Sendable {
     var fetchPreferences: @Sendable () async throws -> PFSettingsPreferences
@@ -19,6 +20,25 @@ struct PFSettingsClientError: Error, Equatable, Sendable {
 
 extension PFSettingsClient: DependencyKey {
     static let liveValue: PFSettingsClient = {
+        return PFSettingsClient(
+            fetchPreferences: {
+                @Dependency(\.apiClient) var apiClient
+                return try await apiClient.send(
+                    PFSettingsEndpoint.preferences,
+                    as: PFSettingsPreferences.self
+                )
+            },
+            savePreferences: { preferences in
+                @Dependency(\.apiClient) var apiClient
+                _ = try await apiClient.send(
+                    PFSettingsEndpoint.save(preferences),
+                    as: PFEmptyResponse.self
+                )
+            }
+        )
+    }()
+
+    static let previewValue: PFSettingsClient = {
         let storage = PFSettingsStorage()
         return PFSettingsClient(
             fetchPreferences: {
@@ -67,5 +87,19 @@ private actor PFSettingsStorage {
 
     func savePreferences(_ preferences: PFSettingsPreferences) {
         self.preferences = preferences
+    }
+}
+
+private enum PFSettingsEndpoint {
+    static let preferences = PFAPIEndpoint(path: "settings/preferences")
+
+    static func save(_ preferences: PFSettingsPreferences) throws -> PFAPIEndpoint {
+        let body = try PFAPIJSONCoding.encode(preferences)
+        return PFAPIEndpoint(
+            path: "settings/preferences",
+            method: .put,
+            headers: ["Content-Type": "application/json"],
+            body: body
+        )
     }
 }

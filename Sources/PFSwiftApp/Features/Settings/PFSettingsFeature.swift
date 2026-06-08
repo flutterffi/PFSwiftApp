@@ -105,14 +105,14 @@ struct PFSettingsFeature {
     }
 }
 
-struct PFSettingsPreferences: Equatable, Sendable {
+struct PFSettingsPreferences: Decodable, Encodable, Equatable, Sendable {
     var isAnalyticsEnabled: Bool
     var isCrashReportingEnabled: Bool
     var isNotificationAlertsEnabled: Bool = true
     var themeMode: PFThemeMode = .system
 }
 
-enum PFThemeMode: String, CaseIterable, Equatable, Identifiable, Sendable {
+enum PFThemeMode: String, CaseIterable, Decodable, Encodable, Equatable, Identifiable, Sendable {
     case system = "System"
     case light = "Light"
     case dark = "Dark"
