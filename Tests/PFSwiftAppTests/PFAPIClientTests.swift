@@ -130,6 +130,80 @@ final class PFAPIClientTests: XCTestCase {
         }
     }
 
+    func testSendRetriesRetryableGETStatusCode() async throws {
+        let session = URLSession(configuration: .pfStubbed)
+        let client = PFAPIClient.live(
+            environment: PFNetworkEnvironment(baseURL: URL(string: "https://api.example.com")!),
+            session: session
+        )
+        PFURLProtocolStub.responses = [
+            (
+                HTTPURLResponse(
+                    url: URL(string: "https://api.example.com/tasks")!,
+                    statusCode: 503,
+                    httpVersion: nil,
+                    headerFields: nil
+                )!,
+                Data("unavailable".utf8)
+            ),
+            (
+                HTTPURLResponse(
+                    url: URL(string: "https://api.example.com/tasks")!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                )!,
+                Data(#"{"id":"task-1","title":"Loaded"}"#.utf8)
+            )
+        ]
+
+        let response = try await client.send(PFStubResponseEndpoint.tasks, as: PFStubResponse.self)
+
+        XCTAssertEqual(response, PFStubResponse(id: "task-1", title: "Loaded"))
+        XCTAssertEqual(PFURLProtocolStub.requestCount, 2)
+    }
+
+    func testSendDoesNotRetryNonRetryableMethod() async {
+        let session = URLSession(configuration: .pfStubbed)
+        let client = PFAPIClient.live(
+            environment: PFNetworkEnvironment(baseURL: URL(string: "https://api.example.com")!),
+            session: session
+        )
+        PFURLProtocolStub.responses = [
+            (
+                HTTPURLResponse(
+                    url: URL(string: "https://api.example.com/tasks")!,
+                    statusCode: 503,
+                    httpVersion: nil,
+                    headerFields: nil
+                )!,
+                Data("unavailable".utf8)
+            ),
+            (
+                HTTPURLResponse(
+                    url: URL(string: "https://api.example.com/tasks")!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                )!,
+                Data(#"{"id":"task-1","title":"Loaded"}"#.utf8)
+            )
+        ]
+
+        do {
+            _ = try await client.send(
+                PFAPIEndpoint(path: "tasks", method: .put),
+                as: PFStubResponse.self
+            )
+            XCTFail("Expected status code failure.")
+        } catch let error as PFAPIError {
+            XCTAssertEqual(error, .statusCode(503, Data("unavailable".utf8)))
+            XCTAssertEqual(PFURLProtocolStub.requestCount, 1)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testJSONCodingMapsDecodingErrors() {
         XCTAssertThrowsError(
             try PFAPIJSONCoding.decode(PFStubResponse.self, from: Data(#"{"id":1}"#.utf8))
@@ -168,11 +242,15 @@ private struct PFInvalidEncodingError: Error {}
 
 private final class PFURLProtocolStub: URLProtocol {
     nonisolated(unsafe) static var lastRequest: URLRequest?
+    nonisolated(unsafe) static var requestCount = 0
     nonisolated(unsafe) static var response: (HTTPURLResponse, Data)?
+    nonisolated(unsafe) static var responses: [(HTTPURLResponse, Data)] = []
 
     static func reset() {
         lastRequest = nil
+        requestCount = 0
         response = nil
+        responses = []
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
@@ -185,7 +263,13 @@ private final class PFURLProtocolStub: URLProtocol {
 
     override func startLoading() {
         Self.lastRequest = request
-        guard let response = Self.response else {
+        Self.requestCount += 1
+        let response = if Self.responses.isEmpty {
+            Self.response
+        } else {
+            Self.responses.removeFirst()
+        }
+        guard let response else {
             client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
             return
         }

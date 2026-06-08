@@ -18,7 +18,8 @@ extension PFAPIClient {
     static func live(
         environment: PFNetworkEnvironment = .development,
         session: URLSession = .shared,
-        decoder: PFAPIResponseDecoder = PFAPIResponseDecoder()
+        decoder: PFAPIResponseDecoder = PFAPIResponseDecoder(),
+        retryPolicy: PFAPIRetryPolicy = .standard
     ) -> PFAPIClient {
         let builder = PFAPIRequestBuilder(environment: environment)
         let sendData: @Sendable (PFAPIEndpoint) async throws -> Data = { endpoint in
@@ -30,26 +31,40 @@ extension PFAPIClient {
                 additionalHeaders = [:]
             }
             let request = try builder.request(for: endpoint, additionalHeaders: additionalHeaders)
-            let data: Data
-            let response: URLResponse
-            do {
-                (data, response) = try await session.data(for: request)
-            } catch {
-                throw PFAPIError.transport(error.localizedDescription)
+            var attempt = 0
+            while true {
+                do {
+                    return try await sendDataOnce(request: request, session: session)
+                } catch let error as PFAPIError {
+                    attempt += 1
+                    guard retryPolicy.shouldRetry(endpoint: endpoint, error: error, attempt: attempt) else {
+                        throw error
+                    }
+                }
             }
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw PFAPIError.invalidResponse
-            }
-            guard (200..<300).contains(httpResponse.statusCode) else {
-                throw PFAPIError.statusCode(httpResponse.statusCode, data)
-            }
-            return data
         }
         return PFAPIClient(
             sendData: sendData,
             responseDecoder: decoder
         )
+    }
+
+    private static func sendDataOnce(request: URLRequest, session: URLSession) async throws -> Data {
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            throw PFAPIError.transport(error.localizedDescription)
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw PFAPIError.invalidResponse
+        }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw PFAPIError.statusCode(httpResponse.statusCode, data)
+        }
+        return data
     }
 }
 
