@@ -3,7 +3,10 @@ import Foundation
 struct PFAPIRequestBuilder: Sendable {
     var environment: PFNetworkEnvironment
 
-    func request(for endpoint: PFAPIEndpoint) throws -> URLRequest {
+    func request(
+        for endpoint: PFAPIEndpoint,
+        additionalHeaders: [String: String] = [:]
+    ) throws -> URLRequest {
         let baseURL = environment.baseURL
         let url = baseURL.appending(path: endpoint.path)
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -21,6 +24,9 @@ struct PFAPIRequestBuilder: Sendable {
         request.httpBody = endpoint.body
 
         for (key, value) in environment.defaultHeaders {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+        for (key, value) in additionalHeaders {
             request.setValue(value, forHTTPHeaderField: key)
         }
         for (key, value) in endpoint.headers {

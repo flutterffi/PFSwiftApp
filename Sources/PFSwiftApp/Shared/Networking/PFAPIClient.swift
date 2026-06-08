@@ -22,7 +22,14 @@ extension PFAPIClient {
     ) -> PFAPIClient {
         let builder = PFAPIRequestBuilder(environment: environment)
         let sendData: @Sendable (PFAPIEndpoint) async throws -> Data = { endpoint in
-            let request = try builder.request(for: endpoint)
+            @Dependency(\.apiSession) var apiSession
+            let additionalHeaders: [String: String]
+            if let token = await apiSession.accessToken(), !token.isEmpty {
+                additionalHeaders = ["Authorization": "Bearer \(token)"]
+            } else {
+                additionalHeaders = [:]
+            }
+            let request = try builder.request(for: endpoint, additionalHeaders: additionalHeaders)
             let data: Data
             let response: URLResponse
             do {

@@ -1,3 +1,4 @@
+import ComposableArchitecture
 @testable import PFSwiftApp
 import XCTest
 
@@ -32,6 +33,27 @@ final class PFAPIClientTests: XCTestCase {
         XCTAssertEqual(request.httpBody, Data("{}".utf8))
     }
 
+    func testRequestBuilderAppliesHeaderPrecedence() throws {
+        let environment = PFNetworkEnvironment(
+            baseURL: URL(string: "https://api.example.com")!,
+            defaultHeaders: [
+                "Accept": "application/json",
+                "Authorization": "Bearer environment"
+            ]
+        )
+        let builder = PFAPIRequestBuilder(environment: environment)
+        let request = try builder.request(
+            for: PFAPIEndpoint(
+                path: "tasks",
+                headers: ["Authorization": "Bearer endpoint"]
+            ),
+            additionalHeaders: ["Authorization": "Bearer session"]
+        )
+
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Accept"), "application/json")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer endpoint")
+    }
+
     func testSendDecodesSuccessfulResponse() async throws {
         let session = URLSession(configuration: .pfStubbed)
         let client = PFAPIClient.live(
@@ -52,6 +74,34 @@ final class PFAPIClientTests: XCTestCase {
 
         XCTAssertEqual(response, PFStubResponse(id: "task-1", title: "Loaded"))
         XCTAssertEqual(PFURLProtocolStub.lastRequest?.url?.absoluteString, "https://api.example.com/tasks")
+    }
+
+    func testSendInjectsAuthorizationHeaderFromSession() async throws {
+        let session = URLSession(configuration: .pfStubbed)
+        let client = PFAPIClient.live(
+            environment: PFNetworkEnvironment(baseURL: URL(string: "https://api.example.com")!),
+            session: session
+        )
+        PFURLProtocolStub.response = (
+            HTTPURLResponse(
+                url: URL(string: "https://api.example.com/tasks")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!,
+            Data(#"{"id":"task-1","title":"Loaded"}"#.utf8)
+        )
+
+        try await withDependencies {
+            $0.apiSession.accessToken = { "access-token" }
+        } operation: {
+            _ = try await client.send(PFStubResponseEndpoint.tasks, as: PFStubResponse.self)
+        }
+
+        XCTAssertEqual(
+            PFURLProtocolStub.lastRequest?.value(forHTTPHeaderField: "Authorization"),
+            "Bearer access-token"
+        )
     }
 
     func testSendThrowsStatusCodeError() async {
